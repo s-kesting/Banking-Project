@@ -12,7 +12,7 @@
 	<artifactId>bankingApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>bankingApp</name>
-	<description>banking app of group 3 for project 2.4</description>
+	<description>banking app for project 2.4</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>24</java.version>
+		<java.version>21</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
