@@ -6,23 +6,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import Routing/Authentication
 
 @SpringBootApplication
 @RestController
-public class BankingAppApplication {
+public class Authentication{
 
-	public static void main(String[] args) {
-		SpringApplication.run(BankingAppApplication.class, args);
+	@GetMapping("/auth/register")
+	public String register() {
+    return "testing authentication path"
 	}
 
-	@GetMapping("/hello")
-	public String hello(@RequestParam(value = "name", defaultValue = "BANANA") String name) {
-		return String.format("ROBBEN SUCK MY %s!", name);
-	}
-
-	@GetMapping("/customer/{id:[0-9]+}/account")
-	public String getAccounts(@PathVariable("id") String id) {
+	@GetMapping("auth/login")
+	public String getAccounts() {
 		return id;
 	}
 
