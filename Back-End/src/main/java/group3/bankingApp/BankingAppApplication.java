@@ -16,7 +16,7 @@ public class BankingAppApplication {
 		SpringApplication.run(BankingAppApplication.class, args);
 	}
     @GetMapping("/hello")
-    public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-      return String.format("Hello %s!", name);
+    public String hello(@RequestParam(value = "name", defaultValue = "BANANA") String name) {
+      return String.format("ROBBEN SUCK MY %s!", name);
     }
 }
