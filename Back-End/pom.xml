@@ -12,7 +12,7 @@
 	<artifactId>bankingApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>bankingApp</name>
-	<description>banking app for project 2.4</description>
+	<description>group3&apos;s banking app for project 2.4</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -32,7 +32,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
 		<dependency>
