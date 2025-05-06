@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BankingAppApplication {
 
+
 	public static void main(String[] args) {
 		SpringApplication.run(BankingAppApplication.class, args);
 	}
