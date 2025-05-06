@@ -13,7 +13,7 @@ public class Authentication{
 
 	@GetMapping("/auth/register")
 	public String register() {
-    return "testing authentication path"
+    return "testing authentication path";
 	}
 
 	@GetMapping("auth/login")
