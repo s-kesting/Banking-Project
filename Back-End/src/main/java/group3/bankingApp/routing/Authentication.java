@@ -7,18 +7,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@SpringBootApplication
-@RestController
 public class Authentication{
 
 	@GetMapping("/auth/register")
 	public String register() {
-    return "testing authentication path"
-	}
-
-	@GetMapping("auth/login")
-	public String getAccounts() {
-		return id;
+    return "testing authentication path";
 	}
 
 }
