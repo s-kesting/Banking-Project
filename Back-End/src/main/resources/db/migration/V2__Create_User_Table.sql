@@ -2,7 +2,7 @@
 CREATE TABLE "user" (
     userID SERIAL PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
-    phoneNumber INTEGER,
+    phoneNumber VARCHAR(225),
     username VARCHAR(100) NOT NULL,
     role role_enum NOT NULL,
     bsn VARCHAR(50),
