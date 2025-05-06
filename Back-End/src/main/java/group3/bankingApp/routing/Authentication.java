@@ -1,4 +1,4 @@
-package group3.bankingApp;
+package group3.bankingApp.routing;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +13,7 @@ public class Authentication{
 
 	@GetMapping("/auth/register")
 	public String register() {
-    return "testing authentication path"
+    return "testing authentication path";
 	}
 
 	@GetMapping("auth/login")
