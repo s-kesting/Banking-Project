@@ -30,11 +30,6 @@ public class BankingAppApplication {
 
 	}
 
-	@GetMapping("/customer/{id:[0-9]+}/account")
-	public String getAccounts(@PathVariable("id") String id) {
-		return id;
-	}
-
 	@Bean
     public CommandLineRunner demo(UserRepository repository) {
         return (args) -> {
