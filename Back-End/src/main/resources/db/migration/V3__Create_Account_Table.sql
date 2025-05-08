@@ -8,5 +8,5 @@ CREATE TABLE account (
     absolute_limit DOUBLE PRECISION,
     verify_account verify_status NOT NULL,
     account_type account_type NOT NULL,
-    FOREIGN KEY (userID) REFERENCES "user"(userID)
+    FOREIGN KEY (userID) REFERENCES users(userID)
 );

@@ -2,7 +2,14 @@ package group3.bankingApp.model;
 
 import group3.bankingApp.model.enums.Role;
 import group3.bankingApp.model.enums.VerifyStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 
 @Entity
@@ -33,7 +40,7 @@ public class User {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "verify_status", nullable = false)
+    @Column(name = "VERIFY_USER", nullable = false)
     private VerifyStatus verifyUser;
 
     // -- Constructors, getters & setters --
@@ -94,3 +101,4 @@ public class User {
         this.verifyUser = verifyUser;
     }
 }
+
