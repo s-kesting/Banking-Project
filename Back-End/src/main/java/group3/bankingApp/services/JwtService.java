@@ -1,8 +1,6 @@
-package group3.bankingApp.service;
+package group3.bankingApp.services;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
