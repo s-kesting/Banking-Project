@@ -19,6 +19,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    // TODO: add pagenation
     public List<User> findAll() {
         return userRepository.findAll();
     }
