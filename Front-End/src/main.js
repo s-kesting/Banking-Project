@@ -9,8 +9,8 @@ import Login from "@/components/Authentication.vue";
 import Dashboard from "@/components/DashBoard.vue"; // new route view
 
 const routes = [
-  { path: "/dashboard", name: "Login", component: Login },
-  { path: "/", name: "Dashboard", component: Dashboard },
+  { path: "/", name: "Login", component: Login },
+  { path: "/Dashboard", name: "Dashboard", component: Dashboard },
 ];
 
 const router = createRouter({
