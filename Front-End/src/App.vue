@@ -1,33 +1,27 @@
 <template>
   <div>
-    <nav class="navbar">
+    <!-- Hide Navbar on /auth -->
+    <nav v-if="!isAuthPage" class="navbar">
       <!-- Left Section -->
       <div class="navbar-left">
         <div class="logo">
           <i class="fas fa-building-columns"></i>
-          <!-- Bank icon -->
           Banking Application
         </div>
         <ul class="nav-links">
           <li>
             <router-link to="/">
-              <i class="fas fa-boxes-stacked"></i>
-              <!-- Products -->
-              Products
+              <i class="fas fa-boxes-stacked"></i> Products
             </router-link>
           </li>
           <li>
             <router-link to="/self-service">
-              <i class="fas fa-tools"></i>
-              <!-- Self service -->
-              Self service
+              <i class="fas fa-tools"></i> Self service
             </router-link>
           </li>
           <li>
             <router-link to="/tasklist">
-              <i class="fas fa-clipboard-check"></i>
-              <!-- Tasklist -->
-              Tasklist
+              <i class="fas fa-clipboard-check"></i> Tasklist
             </router-link>
           </li>
         </ul>
@@ -36,25 +30,24 @@
       <!-- Right Section -->
       <div class="navbar-right">
         <i class="fas fa-magnifying-glass icon"></i>
-        <!-- Search -->
         <div class="notifications">
           <i class="fas fa-bell icon"></i>
           <span class="badge">4</span>
         </div>
-        <span class="username">Ro Bben Le</span>
+        <span class="username">{{ user?.name || "Guest" }}</span>
         <div class="avatar">RL</div>
-        <i class="fas fa-chevron-down icon"></i>
-        <!-- Dropdown -->
+        <i class="fas fa-chevron-down icon" @click="logout"></i>
       </div>
     </nav>
 
+    <!-- Main Content -->
     <router-view />
   </div>
 </template>
 
 <script>
 import { computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -62,38 +55,45 @@ export default {
   name: "App",
   setup() {
     const router = useRouter();
+    const route = useRoute();
     const authStore = useAuthStore();
 
     const isLoggedIn = computed(() => authStore.isLoggedIn);
     const user = computed(() => authStore.user);
+
+    // Detect if current route is /auth
+    const isAuthPage = computed(() => route.path === "/");
 
     onMounted(async () => {
       const token = localStorage.getItem("token");
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         try {
-          await authStore.fetchMe(); // Get user info
+          await authStore.fetchMe();
         } catch (err) {
-          authStore.logout(); // Clear bad token
+          authStore.logout();
+          router.push("/auth");
         }
       }
     });
 
     const logout = () => {
       authStore.logout();
-      router.push("/login"); // Redirect to login
+      router.push("/auth");
     };
 
     return {
       isLoggedIn,
       user,
       logout,
+      isAuthPage,
     };
   },
 };
 </script>
 
 <style scoped>
+/* ... your CSS remains unchanged ... */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -187,7 +187,6 @@ export default {
   white-space: nowrap;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
