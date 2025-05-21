@@ -72,14 +72,14 @@ export default {
           await authStore.fetchMe();
         } catch (err) {
           authStore.logout();
-          router.push("/auth");
+          router.push("/");
         }
       }
     });
 
     const logout = () => {
       authStore.logout();
-      router.push("/auth");
+      router.push("/");
     };
 
     return {

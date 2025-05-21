@@ -14,7 +14,7 @@
       <form @submit.prevent="isLogin ? handleLogin() : handleRegister()">
         <!-- Name field only in register mode -->
         <div v-if="!isLogin" class="form-group">
-          <label for="name">Name</label>
+          <label for="name">Full Name</label>
           <input
             id="name"
             v-model="name"
@@ -23,7 +23,21 @@
             required
           />
         </div>
-        <div class="form-group">
+
+        <!--LOGIN MODE: show username -->
+        <div v-if="isLogin" class="form-group">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            v-model="username"
+            type="text"
+            placeholder="Your username"
+            required
+          />
+        </div>
+
+        <!--REGISTER MODE: show email -->
+        <div v-else class="form-group">
           <label for="email">Email</label>
           <input
             id="email"
@@ -33,19 +47,46 @@
             required
           />
         </div>
+
         <div class="form-group">
           <label for="password">Password</label>
           <input
             id="password"
             v-model="password"
             type="password"
-            placeholder="******"
+            placeholder="****"
             required
           />
         </div>
+
+        <!-- Phone Number (only in register mode) -->
+        <div v-if="!isLogin" class="form-group">
+          <label for="phone">Phone Number</label>
+          <input
+            id="phone"
+            v-model="phoneNumber"
+            type="text"
+            placeholder="0612345678"
+            required
+          />
+        </div>
+
+        <!-- BSN Number (only in register mode) -->
+        <div v-if="!isLogin" class="form-group">
+          <label for="bsn">BSN Number</label>
+          <input
+            id="bsn"
+            v-model="bsn"
+            type="text"
+            placeholder="123456789"
+            required
+          />
+        </div>
+
         <button type="submit" class="auth-button">
           {{ isLogin ? "Login" : "Register" }}
         </button>
+
         <p v-if="error" class="error-message">{{ error }}</p>
       </form>
     </div>
@@ -63,7 +104,10 @@ export default {
     const isLogin = ref(true);
     const name = ref("");
     const email = ref("");
+    const username = ref("");
     const password = ref("");
+    const phoneNumber = ref(""); // FIXED
+    const bsn = ref(""); //  FIXED
     const error = ref("");
 
     const authStore = useAuthStore();
@@ -72,7 +116,7 @@ export default {
     const handleLogin = async () => {
       error.value = "";
       try {
-        await authStore.login(email.value, password.value);
+        await authStore.login(username.value, password.value); // using name as username
         router.push("/dashboard");
       } catch (err) {
         error.value = err.response?.data?.error || "Login failed.";
@@ -81,19 +125,41 @@ export default {
 
     const handleRegister = async () => {
       error.value = "";
+
+      const phonePattern = /^06\d{8}$/;
+      if (!phonePattern.test(phoneNumber.value)) {
+        error.value = "Phone number must start with 06 and be 10 digits.";
+        return;
+      }
+
+      const bsnPattern = /^\d{9}$/;
+      if (!bsnPattern.test(bsn.value)) {
+        error.value = "BSN must be exactly 9 digits.";
+        return;
+      }
+
       try {
-        await authStore.register(name.value, email.value, password.value);
+        await authStore.register({
+          username: name.value,
+          email: email.value,
+          password: password.value,
+          phoneNumber: phoneNumber.value,
+          bsn: bsn.value,
+        });
         isLogin.value = true;
       } catch (err) {
-        error.value = err.response?.data?.error || "Registration failed.";
+        error.value = err.response?.data?.error || err.message;
       }
     };
 
     return {
       isLogin,
       name,
+      username,
       email,
       password,
+      phoneNumber,
+      bsn,
       error,
       handleLogin,
       handleRegister,
