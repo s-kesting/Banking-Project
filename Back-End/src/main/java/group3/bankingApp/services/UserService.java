@@ -26,5 +26,6 @@ public class UserService {
     public User getUserById(Integer id) {
         return userRepository.findById(id).orElseThrow();
     }
+    
 
 }
