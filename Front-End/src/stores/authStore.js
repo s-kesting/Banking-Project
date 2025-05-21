@@ -9,36 +9,53 @@ export const useAuthStore = defineStore("auth", {
 
   getters: {
     isLoggedIn: (state) => !!state.token,
-    isAdmin: (state) => state.user?.role === "admin",
-    isUser: (state) => state.user?.role === "user",
-    userId: (state) => state.user?.id || null, // ACCESS USER ID GLOBALLY
+    userId: (state) => state.user?.id || null,
+    userRole: (state) => state.user?.role || null,
   },
 
   actions: {
-    async login(email, password) {
+    async login(username, password) {
       try {
-        const res = await axios.post("/auth/login", { email, password });
+        const res = await axios.post("/user/auth/login", {
+          username,
+          password,
+        });
 
+        // Save token and user info
         this.token = res.data.token;
-        localStorage.setItem("token", this.token);
+        this.user = {
+          username: res.data.username,
+          role: res.data.role,
+        };
 
+        // Persist in localStorage
+        localStorage.setItem("token", this.token);
+        localStorage.setItem("user", JSON.stringify(this.user));
+
+        // Set axios header for future requests
         axios.defaults.headers.common["Authorization"] = `Bearer ${this.token}`;
-        await this.fetchMe();
       } catch (err) {
         this.logout();
         throw err;
       }
     },
 
-    async register(name, email, password) {
-      await axios.post("/auth/register", { name, email, password });
+    async register({ username, email, password, phoneNumber, bsn }) {
+      await axios.post("/user/auth/register", {
+        username,
+        email,
+        password,
+        phoneNumber,
+        bsn,
+      });
     },
 
     async fetchMe() {
       try {
-        const res = await axios.get("/auth/me");
-        this.user = res.data;
-        localStorage.setItem("user", JSON.stringify(this.user)); // Save to localStorage
+        // You could call your own endpoint if available, for now we just read the token
+        const userData = JSON.parse(localStorage.getItem("user"));
+        this.user = userData;
+        return userData;
       } catch (err) {
         this.logout();
         throw err;

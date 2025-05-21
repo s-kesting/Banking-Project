@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import group3.bankingApp.model.User;
 import group3.bankingApp.services.UserService;
 
-
-
-
-
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
