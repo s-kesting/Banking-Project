@@ -1,4 +1,4 @@
-INSERT INTO "transaction" (sender_account, receiver_account, amount, description, initiated_by, created_at) VALUES
+INSERT INTO transaction (sender_account, receiver_account, amount, description, initiated_by, created_at) VALUES
 -- Recent transactions (last 30 days)
 (1, 3, 150.00, 'Monthly rent payment', 'admin_user', '2025-05-20 14:30:00'),
 (3, 5, 75.50, 'Grocery shopping reimbursement', 'john_doe', '2025-05-20 09:15:00'),

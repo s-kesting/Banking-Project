@@ -1,4 +1,4 @@
-INSERT INTO "account" (userID, IBAN, balance, daily_limit, absolute_limit, verify_account, account_type) VALUES
+INSERT INTO account (userID, IBAN, balance, daily_limit, absolute_limit, verify_account, account_type) VALUES
 (1, 'NL91ABNA0417164300', 2500.00, 1000.00, -500.00, 'ACTIVE', 'Checking'),
 (1, 'NL91ABNA0417164301', 15000.00, 500.00, 0.00, 'ACTIVE', 'Saving'),
 (2, 'NL91ABNA0417164302', 1250.75, 750.00, -250.00, 'ACTIVE', 'Checking'),

@@ -10,19 +10,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "TRANSACTION")
 public class Transaction {
-    
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer transactionId;
 
-    @Column(nullable = false)
-    private Integer senderAccount;    // FK to accounts.accountId
+    @Column(name = "SENDER_ACCOUNT", nullable = false)
+    private Integer senderAccount; // FK to accounts.accountId
 
-    @Column(nullable = false)
-    private Integer receiverAccount;  // FK to accounts.accountId
+    @Column(name = "RECEIVER_ACCOUNT", nullable = false)
+    private Integer receiverAccount; // FK to accounts.accountId
 
     @Column(nullable = false)
     private double amount;
@@ -30,10 +29,10 @@ public class Transaction {
     @Column(length = 255)
     private String description;
 
-    @Column(length = 100)
+    @Column(name = "INITIATED_BY", length = 100)
     private String initiatedBy;
 
-    @Column(nullable = false)
+    @Column(name = "CREATED_AT", nullable = false)
     private LocalDateTime createdAt;
 
     // -- Getters & Setters --
@@ -41,6 +40,7 @@ public class Transaction {
     public Integer getTransactionId() {
         return transactionId;
     }
+
     public void setTransactionId(Integer transactionId) {
         this.transactionId = transactionId;
     }
@@ -48,6 +48,7 @@ public class Transaction {
     public Integer getSenderAccount() {
         return senderAccount;
     }
+
     public void setSenderAccount(Integer senderAccount) {
         this.senderAccount = senderAccount;
     }
@@ -55,6 +56,7 @@ public class Transaction {
     public Integer getReceiverAccount() {
         return receiverAccount;
     }
+
     public void setReceiverAccount(Integer receiverAccount) {
         this.receiverAccount = receiverAccount;
     }
@@ -62,6 +64,7 @@ public class Transaction {
     public double getAmount() {
         return amount;
     }
+
     public void setAmount(double amount) {
         this.amount = amount;
     }
@@ -69,6 +72,7 @@ public class Transaction {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -76,6 +80,7 @@ public class Transaction {
     public String getInitiatedBy() {
         return initiatedBy;
     }
+
     public void setInitiatedBy(String initiatedBy) {
         this.initiatedBy = initiatedBy;
     }
@@ -83,6 +88,7 @@ public class Transaction {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }

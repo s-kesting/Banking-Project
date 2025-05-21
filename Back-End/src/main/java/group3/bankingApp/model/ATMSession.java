@@ -9,19 +9,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-
 @Entity
-@Table(name = "atm_sessions")
+@Table(name = "ATMSESSION")
 public class ATMSession {
     @Id
-    
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer sessionId;
 
     @Column(nullable = false)
-    private Integer userId;        // FK to users.userId
+    private Integer userId; // FK to users.userId
 
-    @Column(nullable = false)
+    @Column(name = "LOGIN_TIME", nullable = false)
     private LocalDateTime loginTime;
 
     // -- Getters & Setters --
@@ -29,6 +28,7 @@ public class ATMSession {
     public Integer getSessionId() {
         return sessionId;
     }
+
     public void setSessionId(Integer sessionId) {
         this.sessionId = sessionId;
     }
@@ -36,6 +36,7 @@ public class ATMSession {
     public Integer getUserId() {
         return userId;
     }
+
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
@@ -43,6 +44,7 @@ public class ATMSession {
     public LocalDateTime getLoginTime() {
         return loginTime;
     }
+
     public void setLoginTime(LocalDateTime loginTime) {
         this.loginTime = loginTime;
     }

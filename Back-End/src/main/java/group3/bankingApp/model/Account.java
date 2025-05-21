@@ -12,7 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "account")
+@Table(name = "ACCOUNT")
 public class Account {
 
     @Id
@@ -28,18 +28,18 @@ public class Account {
     @Column(nullable = false)
     private double balance;
 
-    @Column(nullable = false)
+    @Column(name = "DAILY_LIMIT", nullable = false)
     private double dailyLimit;
 
-    @Column(nullable = false)
+    @Column(name = "ABSOLUTE_LIMIT", nullable = false)
     private double absoluteLimit;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "VERIFY_STATUS", nullable = false)
     private VerifyStatus verifyAccount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "ACCOUNT_TYPE", nullable = false)
     private AccountType accountType;
 
     // -- Getters & Setters --

@@ -1,5 +1,5 @@
 -- Create User table
-CREATE TABLE "users" (
+CREATE TABLE users (
     userID SERIAL PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
     phoneNumber VARCHAR(225),
