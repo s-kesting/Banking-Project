@@ -14,10 +14,6 @@ import group3.bankingApp.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-
-
-
-
 @RestController
 @RequestMapping("/api/user") //Get all users
 @Tag(name = "Users", description = "Operations on user accounts")

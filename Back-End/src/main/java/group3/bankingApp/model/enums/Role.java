@@ -1,6 +1,13 @@
 package group3.bankingApp.model.enums;
 
-public enum Role {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum Role implements GrantedAuthority {
     CUSTOMER,
-    EMPLOYEE
+    EMPLOYEE;
+
+    @Override
+    public String getAuthority() {
+        return name(); // This returns "CUSTOMER" or "EMPLOYEE"
+    }
 }
