@@ -1,5 +1,5 @@
 -- Create Account table
-CREATE TABLE account (
+CREATE TABLE "account" (
     accountID SERIAL PRIMARY KEY,
     userID INTEGER NOT NULL,
     IBAN VARCHAR(34) NOT NULL,
@@ -8,5 +8,5 @@ CREATE TABLE account (
     absolute_limit DOUBLE PRECISION,
     verify_account verify_status NOT NULL,
     account_type account_type NOT NULL,
-    FOREIGN KEY (userID) REFERENCES users(userID)
+    FOREIGN KEY (userID) REFERENCES "users"(userID)
 );

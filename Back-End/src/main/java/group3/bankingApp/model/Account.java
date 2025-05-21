@@ -12,15 +12,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "accounts")
+@Table(name = "account")
 public class Account {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer accountId;
 
     @Column(nullable = false)
-    private Integer userId;           // FK to users.userId
+    private Integer userId; // FK to users.userId
 
     @Column(nullable = false, unique = true, length = 34)
     private String IBAN;
@@ -47,6 +47,7 @@ public class Account {
     public Integer getAccountId() {
         return accountId;
     }
+
     public void setAccountId(Integer accountId) {
         this.accountId = accountId;
     }
@@ -54,6 +55,7 @@ public class Account {
     public Integer getUserId() {
         return userId;
     }
+
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
@@ -61,6 +63,7 @@ public class Account {
     public String getIBAN() {
         return IBAN;
     }
+
     public void setIBAN(String IBAN) {
         this.IBAN = IBAN;
     }
@@ -68,6 +71,7 @@ public class Account {
     public double getBalance() {
         return balance;
     }
+
     public void setBalance(double balance) {
         this.balance = balance;
     }
@@ -75,6 +79,7 @@ public class Account {
     public double getDailyLimit() {
         return dailyLimit;
     }
+
     public void setDailyLimit(double dailyLimit) {
         this.dailyLimit = dailyLimit;
     }
@@ -82,6 +87,7 @@ public class Account {
     public double getAbsoluteLimit() {
         return absoluteLimit;
     }
+
     public void setAbsoluteLimit(double absoluteLimit) {
         this.absoluteLimit = absoluteLimit;
     }
@@ -89,6 +95,7 @@ public class Account {
     public VerifyStatus getVerifyAccount() {
         return verifyAccount;
     }
+
     public void setVerifyAccount(VerifyStatus verifyAccount) {
         this.verifyAccount = verifyAccount;
     }
@@ -96,8 +103,8 @@ public class Account {
     public AccountType getAccountType() {
         return accountType;
     }
+
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
     }
 }
-
