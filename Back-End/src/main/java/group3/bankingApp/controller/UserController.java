@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import group3.bankingApp.model.User;
 import group3.bankingApp.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/user") //Get all users
+@Tag(name = "Users", description = "Operations on user accounts")
 public class UserController {
     private final UserService userService;
 
@@ -21,12 +24,20 @@ public class UserController {
         this.userService = userService;
     }
 
+    //get list of users
     @GetMapping
+    @Operation(
+    summary = "List all users",
+    description = "Fetches all registered users in the system.")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.findAll();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
     
+    //get user by ID
+    @Operation(
+    summary = "Get a user by ID",
+    description = "Returns a single user when given their unique ID.")
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id){
         User user = userService.getUserById(id);
