@@ -19,7 +19,8 @@ const router = createRouter({
 });
 
 // Axios config (optional)
-axios.defaults.baseURL = "http://localhost";
+import { API_BASE_URL } from "@/config";
+axios.defaults.baseURL = API_BASE_URL;
 
 const app = createApp(App);
 app.use(router);
