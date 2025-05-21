@@ -27,3 +27,4 @@ customer account details
 Mock ATM
   - login in with email and password
   - user can desposit and withdraw cash
+  
