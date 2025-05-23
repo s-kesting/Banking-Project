@@ -35,16 +35,26 @@ public class AuthController {
         return ResponseEntity.ok("User registered successfully");
     }
 
-    @PostMapping("/login")
+        @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String username = request.get("username");
         String password = request.get("password");
 
-        System.out.println("Login attempt for: " + username);
+        System.out.println("Login attempt for username: '" + username + "'");
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (username == null || password == null) {
+            return ResponseEntity.badRequest().body("Username and password must not be null");
+        }
 
+        username = username.trim(); // safe default
+
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isEmpty()) {
+            System.out.println("Username not found in database.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username");
+        }
+
+        User user = optionalUser.get();
         System.out.println("Found user: " + user.getUsername());
         System.out.println("VerifyStatus: " + user.getVerifyUser());
 
@@ -53,14 +63,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
-        // if (user.getVerifyUser() != VerifyStatus.ACTIVE) {
-        //     System.out.println("User not verified: " + user.getVerifyUser());
-        //     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet verified");
-        // }
+        if (user.getVerifyUser() != VerifyStatus.ACTIVE) {
+            System.out.println("User not verified: " + user.getVerifyUser());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet verified");
+        }
 
         String token = jwtTokenProvider.createToken(username, user.getRole());
-
         System.out.println("Token generated successfully for: " + username);
+
         return ResponseEntity.ok(Map.of(
                 "token", token,
                 "username", username,
