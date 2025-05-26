@@ -20,7 +20,7 @@ public class AuthController {
     private final BCryptPasswordEncoder passwordEncoder;
 
     public AuthController(UserRepository userRepository, JwtTokenProvider jwtTokenProvider,
-                          BCryptPasswordEncoder passwordEncoder) {
+            BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
@@ -42,6 +42,7 @@ public class AuthController {
 
         System.out.println("Login attempt for: " + username);
 
+        // FIXME: make this a userService call
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -54,8 +55,9 @@ public class AuthController {
         }
 
         // if (user.getVerifyUser() != VerifyStatus.ACTIVE) {
-        //     System.out.println("User not verified: " + user.getVerifyUser());
-        //     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet verified");
+        // System.out.println("User not verified: " + user.getVerifyUser());
+        // return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet
+        // verified");
         // }
 
         String token = jwtTokenProvider.createToken(username, user.getRole());
@@ -64,9 +66,7 @@ public class AuthController {
         return ResponseEntity.ok(Map.of(
                 "token", token,
                 "username", username,
-                "role", user.getRole()
-        ));
+                "role", user.getRole()));
     }
-
 
 }
