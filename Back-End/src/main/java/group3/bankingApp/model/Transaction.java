@@ -29,9 +29,6 @@ public class Transaction {
     @Column(length = 255)
     private String description;
 
-    @Column(name = "INITIATED_BY", length = 100)
-    private String initiatedBy;
-
     @Column(name = "CREATED_AT", nullable = false)
     private LocalDateTime createdAt;
 
@@ -75,14 +72,6 @@ public class Transaction {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getInitiatedBy() {
-        return initiatedBy;
-    }
-
-    public void setInitiatedBy(String initiatedBy) {
-        this.initiatedBy = initiatedBy;
     }
 
     public LocalDateTime getCreatedAt() {

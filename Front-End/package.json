@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vue/language-server": "^2.2.10",
+    "@vue/typescript-plugin": "^2.2.10",
     "axios": "^1.8.1",
     "pinia": "^3.0.1",
     "typescript": "^5.8.3",

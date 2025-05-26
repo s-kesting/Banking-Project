@@ -27,6 +27,12 @@ public class AccountController {
         return accountService.findById(id);
     }
 
+    @Operation(summary = "Get users account by the users ID")
+    @GetMapping("user/{id}")
+    public Account getAccountsByUserId(@ParameterObject int userId) {
+        return accountService.findUsersAccounts(userId);
+    }
+
     @Operation(summary = "get all accounts")
     @GetMapping()
     public Page<Account> getAccounts(

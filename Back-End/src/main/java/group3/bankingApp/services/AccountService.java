@@ -1,5 +1,7 @@
 package group3.bankingApp.services;
 
+import java.awt.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,9 +25,9 @@ public class AccountService {
         return accountRepository.findById(id).orElseThrow();
     }
 
-    // public Page<Account> findUsersAccounts(){
-    // return accountRepository.findBy().t
-    // }
+    public Account findUsersAccounts(int userId) {
+        return accountRepository.findByUserId(userId).orElseThrow();
+    }
 
     public Page<Account> findAll(Pageable pageable) {
         return accountRepository.findAll(pageable);
