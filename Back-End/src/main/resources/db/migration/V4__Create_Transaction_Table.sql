@@ -1,7 +1,7 @@
 
 -- Create Transaction table
 CREATE TABLE transaction (
-    transactionID SERIAL PRIMARY KEY,
+    transactionID INT AUTO_INCREMENT PRIMARY KEY,
     sender_account INTEGER NOT NULL,
     receiver_account INTEGER NOT NULL,
     amount DOUBLE PRECISION NOT NULL,

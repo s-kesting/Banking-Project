@@ -37,13 +37,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+
+        // FIXME: dont call repository through the controller, use a service class
+        //
+
         String username = request.get("username");
         String password = request.get("password");
 
         System.out.println("Login attempt for username: '" + username + "'");
-        // FIXME: make this a userService call
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+
         if (username == null || password == null) {
             return ResponseEntity.badRequest().body("Username and password must not be null");
         }
@@ -65,18 +67,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
-<<<<<<< HEAD
-        // if (user.getVerifyUser() != VerifyStatus.ACTIVE) {
-        // System.out.println("User not verified: " + user.getVerifyUser());
-        // return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet
-        // verified");
-        // }
-=======
         if (user.getVerifyUser() != VerifyStatus.ACTIVE) {
             System.out.println("User not verified: " + user.getVerifyUser());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet verified");
         }
->>>>>>> origin/main
 
         String token = jwtTokenProvider.createToken(username, user.getRole());
         System.out.println("Token generated successfully for: " + username);

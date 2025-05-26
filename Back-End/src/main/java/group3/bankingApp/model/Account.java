@@ -17,9 +17,10 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ACCOUNTID")
     private Integer accountId;
 
-    @Column(nullable = false)
+    @Column(name = "USER_ID", nullable = false)
     private Integer userId; // FK to users.userId
 
     @Column(nullable = false, unique = true, length = 34)
@@ -35,7 +36,7 @@ public class Account {
     private double absoluteLimit;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "VERIFY_STATUS", nullable = false)
+    @Column(name = "VERIFY_ACCOUNT", nullable = false)
     private VerifyStatus verifyAccount;
 
     @Enumerated(EnumType.STRING)
