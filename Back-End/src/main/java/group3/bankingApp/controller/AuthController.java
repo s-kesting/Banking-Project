@@ -22,10 +22,12 @@ public class AuthController {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AccountService accountService;
 
+
     public AuthController(UserRepository userRepository,
                         JwtTokenProvider jwtTokenProvider,
                         BCryptPasswordEncoder passwordEncoder,
                         AccountService accountService) {
+
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
@@ -66,8 +68,12 @@ public ResponseEntity<?> register(@RequestBody User user) {
 
 
 
-        @PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+
+        // FIXME: dont call repository through the controller, use a service class
+        //
+
         String username = request.get("username");
         String password = request.get("password");
 
@@ -105,9 +111,7 @@ public ResponseEntity<?> register(@RequestBody User user) {
         return ResponseEntity.ok(Map.of(
                 "token", token,
                 "username", username,
-                "role", user.getRole()
-        ));
+                "role", user.getRole()));
     }
-
 
 }

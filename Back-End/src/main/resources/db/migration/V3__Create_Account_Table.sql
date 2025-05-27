@@ -1,6 +1,6 @@
 -- Create Account table
 CREATE TABLE account (
-    accountID SERIAL PRIMARY KEY,
+accountID INT AUTO_INCREMENT PRIMARY KEY,
     userID INTEGER NOT NULL,
     IBAN VARCHAR(34) NOT NULL,
     balance DECIMAL(15,2) NOT NULL DEFAULT 0.00,

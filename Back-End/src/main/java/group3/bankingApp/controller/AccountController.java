@@ -17,15 +17,26 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    public AccountController(AccountService accountService){
+    public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
 
-    
-    @Operation(summary = "Get accounts")
-    @GetMapping
+    @Operation(summary = "Get account by id")
+    @GetMapping("/{id}")
+    public Account getAccount(@ParameterObject int id) {
+        return accountService.findById(id);
+    }
+
+    @Operation(summary = "Get users account by the users ID")
+    @GetMapping("user/{id}")
+    public Account getAccountsByUserId(@ParameterObject int userId) {
+        return accountService.findUsersAccounts(userId);
+    }
+
+    @Operation(summary = "get all accounts")
+    @GetMapping()
     public Page<Account> getAccounts(
-    @ParameterObject Pageable pageable) {
+            @ParameterObject Pageable pageable) {
         return accountService.findAll(pageable);
     }
 

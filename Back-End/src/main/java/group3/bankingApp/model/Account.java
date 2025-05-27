@@ -21,6 +21,7 @@ public class Account {
     private Integer accountId;
 
     @Column(name = "USERID", nullable = false)
+
     private Integer userId; // FK to users.userId
 
     @Column(nullable = false, unique = true, length = 34)

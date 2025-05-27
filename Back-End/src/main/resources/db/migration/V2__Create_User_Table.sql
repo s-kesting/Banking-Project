@@ -1,6 +1,6 @@
 -- Create User table
 CREATE TABLE users (
-    userID SERIAL PRIMARY KEY,
+    userID INT AUTO_INCREMENT PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
     phoneNumber VARCHAR(225),
     username VARCHAR(100) NOT NULL,

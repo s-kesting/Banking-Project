@@ -27,7 +27,7 @@ public class WebSecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    //FIXEME: make sure to change the security filter
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
