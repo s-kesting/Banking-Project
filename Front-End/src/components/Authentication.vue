@@ -17,7 +17,7 @@
           <label for="name">Full Name</label>
           <input
             id="name"
-            v-model="name"
+            v-model="username"
             type="text"
             placeholder="Your full name"
             required
@@ -102,29 +102,49 @@ export default {
   name: "Auth",
   setup() {
     const isLogin = ref(true);
-    const name = ref("");
     const email = ref("");
     const username = ref("");
     const password = ref("");
     const phoneNumber = ref(""); // FIXED
     const bsn = ref(""); //  FIXED
     const error = ref("");
+    const successMessage = ref("");
 
     const authStore = useAuthStore();
     const router = useRouter();
 
     const handleLogin = async () => {
       error.value = "";
+      successMessage.value = "";
+
       try {
-        await authStore.login(username.value, password.value); // using name as username
-        router.push("/dashboard");
+        await authStore.login(username.value, password.value);
+
+        // Redirect based on role
+        const role = authStore.user.role;
+        if (role === "EMPLOYEE") {
+          router.push("/AdminDashboard");
+        } else {
+          router.push("/Dashboard");
+        }
       } catch (err) {
-        error.value = err.response?.data?.error || "Login failed.";
+        if (err.response?.status === 403) {
+          error.value = "Login failed - User not verified yet";
+        } else if (err.response?.status === 401) {
+          error.value = "Login failed - Invalid username or password";
+        } else {
+          error.value = err.response?.data || "Login failed.";
+        }
       }
     };
 
     const handleRegister = async () => {
       error.value = "";
+
+      if (!username.value.trim()) {
+        error.value = "Username cannot be empty.";
+        return;
+      }
 
       const phonePattern = /^06\d{8}$/;
       if (!phonePattern.test(phoneNumber.value)) {
@@ -140,7 +160,7 @@ export default {
 
       try {
         await authStore.register({
-          username: name.value,
+          username: username.value,
           email: email.value,
           password: password.value,
           phoneNumber: phoneNumber.value,
@@ -154,7 +174,6 @@ export default {
 
     return {
       isLogin,
-      name,
       username,
       email,
       password,
@@ -163,6 +182,7 @@ export default {
       error,
       handleLogin,
       handleRegister,
+      successMessage,
     };
   },
 };

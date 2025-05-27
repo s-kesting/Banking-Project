@@ -4,6 +4,8 @@ import group3.bankingApp.model.*;
 import group3.bankingApp.model.enums.*;
 import group3.bankingApp.repository.UserRepository;
 import group3.bankingApp.security.JwtTokenProvider;
+import group3.bankingApp.services.AccountService;
+
 import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -12,28 +14,59 @@ import java.util.*;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/user/auth")
+@RequestMapping("/user/auth")
 public class AuthController {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final AccountService accountService;
 
-    public AuthController(UserRepository userRepository, JwtTokenProvider jwtTokenProvider,
-            BCryptPasswordEncoder passwordEncoder) {
+
+    public AuthController(UserRepository userRepository,
+                        JwtTokenProvider jwtTokenProvider,
+                        BCryptPasswordEncoder passwordEncoder,
+                        AccountService accountService) {
+
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
+        this.accountService = accountService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+public ResponseEntity<?> register(@RequestBody User user) {
+    try {
+        // Check if username already exists
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Username already taken");
+        }
+
+        // Set user defaults
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.CUSTOMER); // default or based on your form
-        user.setVerifyUser(VerifyStatus.PENDING); // sets verification status
-        userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully");
+        user.setRole(Role.CUSTOMER);
+        user.setVerifyUser(VerifyStatus.PENDING);
+
+        // Save user
+        User savedUser = userRepository.save(user);
+
+        // Create default accounts (Checking + Saving)
+        accountService.createDefaultAccountsForUser(savedUser.getUserId());
+
+        // Return success response
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", "User registered successfully"
+        ));
+    } catch (Exception e) {
+        e.printStackTrace(); // Good for debugging
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("success", false, "error", "Registration failed: " + e.getMessage()));
     }
+}
+
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
@@ -67,10 +100,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
-        if (user.getVerifyUser() != VerifyStatus.ACTIVE) {
-            System.out.println("User not verified: " + user.getVerifyUser());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet verified");
-        }
+         if (user.getVerifyUser() != VerifyStatus.ACTIVE) {
+             System.out.println("User not verified: " + user.getVerifyUser());
+             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet verified");
+         }
 
         String token = jwtTokenProvider.createToken(username, user.getRole());
         System.out.println("Token generated successfully for: " + username);
