@@ -13,7 +13,7 @@ import java.util.*;
 @Component
 public class JwtTokenProvider {
 
-    // ✅ MUST be at least 32 characters for HS256
+    // MUST be at least 32 characters for HS256
     private final String jwtSecret = "ThisIsASuperStrongJWTSecretKey!123";
     private final long jwtExpirationInMs = 3600000; // 1 hour
 

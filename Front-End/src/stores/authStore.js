@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import { API_ENDPOINTS } from "@/config";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -16,7 +17,7 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async login(username, password) {
       try {
-        const res = await axios.post("/user/auth/login", {
+        const res = await axios.post("/api/user/auth/login", {
           username,
           password,
         });
@@ -26,6 +27,7 @@ export const useAuthStore = defineStore("auth", {
         this.user = {
           username: res.data.username,
           role: res.data.role,
+          userId: res.data.userId,
         };
 
         // Persist in localStorage
@@ -41,7 +43,7 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async register({ username, email, password, phoneNumber, bsn }) {
-      await axios.post("/user/auth/register", {
+      await axios.post("/api/user/auth/register", {
         username,
         email,
         password,
