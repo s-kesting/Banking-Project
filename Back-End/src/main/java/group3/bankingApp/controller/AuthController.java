@@ -14,7 +14,7 @@ import java.util.*;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
-@RequestMapping("/user/auth")
+@RequestMapping("/api/user/auth")
 public class AuthController {
 
     private final UserRepository userRepository;

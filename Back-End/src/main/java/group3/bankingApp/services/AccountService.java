@@ -1,6 +1,8 @@
 package group3.bankingApp.services;
+import java.util.NoSuchElementException;
 import java.util.Random;
-import java.awt.List;
+import java.util.List;
+
 
 
 import org.springframework.data.domain.Page;
@@ -28,9 +30,14 @@ public class AccountService {
         return accountRepository.findById(id).orElseThrow();
     }
 
-    public Account findUsersAccounts(int userId) {
-        return accountRepository.findByUserId(userId).orElseThrow();
+    public List<Account> findUsersAccounts(int userId) {
+        List<Account> accounts = accountRepository.findByUserId(userId);
+        if (accounts.isEmpty()) {
+            throw new NoSuchElementException("No accounts found for user ID: " + userId);
+        }
+        return accounts;
     }
+
 
     public Page<Account> findAll(Pageable pageable) {
         return accountRepository.findAll(pageable);
