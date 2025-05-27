@@ -25,8 +25,8 @@ public class AccountService {
         return accountRepository.findById(id).orElseThrow();
     }
 
-    public Account findUsersAccounts(int userId) {
-        return accountRepository.findByUserId(userId).orElseThrow();
+    public List<Account> findUsersAccounts(int userId) {
+        return accountRepository.findByUserId(userId);
     }
 
     public Page<Account> findAll(Pageable pageable) {

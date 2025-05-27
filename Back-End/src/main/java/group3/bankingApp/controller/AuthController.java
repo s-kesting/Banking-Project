@@ -73,12 +73,13 @@ public class AuthController {
         }
 
         String token = jwtTokenProvider.createToken(username, user.getRole());
-        System.out.println("Token generated successfully for: " + username);
+        System.out.println("[INFO] Token generated successfully for: " + username);
 
         return ResponseEntity.ok(Map.of(
                 "token", token,
                 "username", username,
-                "role", user.getRole()));
+                "role", user.getRole(),
+                "id", user.getUserId()));
     }
 
 }

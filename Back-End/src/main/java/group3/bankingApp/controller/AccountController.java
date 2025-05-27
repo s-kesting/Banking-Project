@@ -3,9 +3,13 @@ package group3.bankingApp.controller;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.awt.List;
+import com.sun.net.httpserver.HttpServer;
 
 import group3.bankingApp.model.Account;
 import group3.bankingApp.services.AccountService;
@@ -30,7 +34,10 @@ public class AccountController {
     @Operation(summary = "Get users account by the users ID")
     @GetMapping("user/{id}")
     public Account getAccountsByUserId(@ParameterObject int userId) {
-        return accountService.findUsersAccounts(userId);
+        System.out.println("accounts endpoint triggerd");
+        List<Account> accounts = accountService.findUsersAccounts(userId);
+        System.out.println(accounts);
+        return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 
     @Operation(summary = "get all accounts")
