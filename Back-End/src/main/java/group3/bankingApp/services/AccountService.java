@@ -1,7 +1,5 @@
 package group3.bankingApp.services;
 
-import java.awt.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

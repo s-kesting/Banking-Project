@@ -26,12 +26,9 @@ public class TransactionService {
         //sender
         accountRepository.withdraw(transaction.getSenderAccount(), transaction.getAmount());
         //receiver
-        accountRepository.deposite(transaction.getReceiverAccount(),transaction.getAmount());
+        accountRepository.deposit(transaction.getReceiverAccount(),transaction.getAmount());
         //save transaction record
         return transactionRepository.save(transaction);
         
     }
-
-
-
 }
