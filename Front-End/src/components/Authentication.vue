@@ -56,92 +56,11 @@
         </div>
     </div>
 
-    <div class="auth-card">
-      <h2 class="auth-title">{{ isLogin ? "Login" : "Register" }}</h2>
-      <form @submit.prevent="isLogin ? handleLogin() : handleRegister()">
-        <!-- Name field only in register mode -->
-        <div v-if="!isLogin" class="form-group">
-          <label for="name">Full Name</label>
-          <input
-            id="name"
-            v-model="username"
-            type="text"
-            placeholder="Your full name"
-            required
-          />
-        </div>
-
-        <!--LOGIN MODE: show username -->
-        <div v-if="isLogin" class="form-group">
-          <label for="username">Username</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="Your username"
-            required
-          />
-        </div>
-
-        <!--REGISTER MODE: show email -->
-        <div v-else class="form-group">
-          <label for="email">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="your@email.com"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="****"
-            required
-          />
-        </div>
-
-        <!-- Phone Number (only in register mode) -->
-        <div v-if="!isLogin" class="form-group">
-          <label for="phone">Phone Number</label>
-          <input
-            id="phone"
-            v-model="phoneNumber"
-            type="text"
-            placeholder="0612345678"
-            required
-          />
-        </div>
-
-        <!-- BSN Number (only in register mode) -->
-        <div v-if="!isLogin" class="form-group">
-          <label for="bsn">BSN Number</label>
-          <input
-            id="bsn"
-            v-model="bsn"
-            type="text"
-            placeholder="123456789"
-            required
-          />
-        </div>
-
-        <button type="submit" class="auth-button">
-          {{ isLogin ? "Login" : "Register" }}
-        </button>
-
-        <p v-if="error" class="error-message">{{ error }}</p>
-      </form>
-    </div>
-</template>
+    </template>
 <script>
 import { ref } from "vue";
+import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "vue-router";
 import API_ENDPOINTS from "@/config.js";
 import axios from "axios";
 
@@ -149,6 +68,8 @@ import axios from "axios";
 export default {
   name: "Auth",
   setup() {
+        const router = useRouter()
+const route = useRoute()
     const isLogin = ref(true);
     const email = ref("");
     const username = ref("");
@@ -159,7 +80,6 @@ export default {
     const successMessage = ref("");
 
         const authStore = useAuthStore();
-        const router = useRouter();
 
     const handleLogin = async () => {
       error.value = "";
@@ -167,15 +87,9 @@ export default {
 
       try {
         await authStore.login(username.value, password.value);
-
-        // Redirect based on role
-        const role = authStore.user.role;
-        if (role === "EMPLOYEE") {
-          router.push("/AdminDashboard");
-        } else {
-          router.push("/Dashboard");
-        }
-      } catch (err) {
+                console.log('successfull login')
+                router.push('/dashboard')
+            } catch (err) {
         if (err.response?.status === 403) {
           error.value = "Login failed - User not verified yet";
         } else if (err.response?.status === 401) {

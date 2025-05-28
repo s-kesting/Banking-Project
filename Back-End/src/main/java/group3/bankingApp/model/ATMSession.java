@@ -18,7 +18,7 @@ public class ATMSession {
     private Integer sessionId;
 
     @Column(nullable = false)
-    private Integer userId; // FK to users.userId
+    private Integer accountId; // FK to account.accountId
 
     @Column(name = "LOGIN_TIME", nullable = false)
     private LocalDateTime loginTime;
@@ -33,12 +33,12 @@ public class ATMSession {
         this.sessionId = sessionId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Integer getAccountId() {
+        return accountId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setAccountId(Integer accountId) {
+        this.accountId = accountId;
     }
 
     public LocalDateTime getLoginTime() {
