@@ -92,7 +92,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import { API_ENDPOINTS } from "@/config"; // ✅ Make sure this path is correct
+import { API_ENDPOINTS } from "@/config"; 
 
 const users = ref([]);
 const searchQuery = ref("");

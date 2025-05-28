@@ -35,36 +35,36 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-public ResponseEntity<?> register(@RequestBody User user) {
-    try {
-        // Check if username already exists
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Username already taken");
+    public ResponseEntity<?> register(@RequestBody User user) {
+        try {
+            // Check if username already exists
+            if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Username already taken");
+            }
+
+            // Set user defaults
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRole(Role.CUSTOMER);
+            user.setVerifyUser(VerifyStatus.PENDING);
+
+            // Save user
+            User savedUser = userRepository.save(user);
+
+            // Create default accounts (Checking + Saving)
+            accountService.createDefaultAccountsForUser(savedUser.getUserId());
+
+            // Return success response
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "User registered successfully"
+            ));
+        } catch (Exception e) {
+            e.printStackTrace(); // Good for debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("success", false, "error", "Registration failed: " + e.getMessage()));
         }
-
-        // Set user defaults
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.CUSTOMER);
-        user.setVerifyUser(VerifyStatus.PENDING);
-
-        // Save user
-        User savedUser = userRepository.save(user);
-
-        // Create default accounts (Checking + Saving)
-        accountService.createDefaultAccountsForUser(savedUser.getUserId());
-
-        // Return success response
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "User registered successfully"
-        ));
-    } catch (Exception e) {
-        e.printStackTrace(); // Good for debugging
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(Map.of("success", false, "error", "Registration failed: " + e.getMessage()));
     }
-}
 
 
 

@@ -30,6 +30,8 @@ export const useAuthStore = defineStore("auth", {
           userId: res.data.userId,
         };
 
+        console.log("Logged in role:", this.user.role);
+
         // Persist in localStorage
         localStorage.setItem("token", this.token);
         localStorage.setItem("user", JSON.stringify(this.user));

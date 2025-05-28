@@ -44,8 +44,8 @@ public class AccountService {
     }
 
     public void createDefaultAccountsForUser(Integer userId) {
-    createAccount(userId, AccountType.CHECKING);
-    createAccount(userId, AccountType.SAVING);
+    createAccount(userId, AccountType.Checking);
+    createAccount(userId, AccountType.Saving);
     }
 
     private void createAccount(Integer userId, AccountType type) {
