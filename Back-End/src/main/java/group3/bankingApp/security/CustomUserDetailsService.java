@@ -17,7 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         // Fetch from DB
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username.trim())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         // Convert our custom User to Spring’s UserDetails
