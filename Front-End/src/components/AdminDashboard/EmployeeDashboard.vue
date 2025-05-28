@@ -91,21 +91,27 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+//import apiClient from "axios";
+import  apiClient  from "@/utils/apiClient";
 import { API_ENDPOINTS } from "@/config"; 
+import useAuthStore from "@/stores/authStore";
 
 const users = ref([]);
 const searchQuery = ref("");
 const errorMessage = ref("");
-
+let authStore = useAuthStore()
+console.log(authStore.getUserData())
+console.log(authStore.token)
 // ✅ Load all users with their accounts
 const fetchUsers = async () => {
+    console.log("fetching users")
   try {
     errorMessage.value = "";
     const queryParam = searchQuery.value
       ? `?username=${searchQuery.value}`
       : "";
-    const res = await axios.get(`${API_ENDPOINTS.employee}/users${queryParam}`);
+        console.log(queryParam)
+    const res = await apiClient.get(`${API_ENDPOINTS.employee}/users${queryParam}`);
     users.value = res.data;
   } catch (err) {
     errorMessage.value =
@@ -118,11 +124,11 @@ const updateUserAndAccount = async (user, account) => {
   try {
     errorMessage.value = "";
 
-    await axios.put(`${API_ENDPOINTS.employee}/users/${user.userId}/verify`, {
+    await apiClient.put(`${API_ENDPOINTS.employee}/users/${user.userId}/verify`, {
       verifyUser: user.verifyUser,
     });
 
-    await axios.put(`${API_ENDPOINTS.employee}/accounts/${account.accountId}`, {
+    await apiClient.put(`${API_ENDPOINTS.employee}/accounts/${account.accountId}`, {
       verifyAccount: account.verifyAccount,
       dailyLimit: account.dailyLimit,
       absoluteLimit: account.absoluteLimit,

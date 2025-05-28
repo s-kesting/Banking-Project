@@ -18,7 +18,6 @@ import AccountList from "@/components/accounts/AccountList.vue";
 import API_ENDPOINTS from "@/config";
 import { useAuthStore } from '@/stores/authStore.js'
 import { ref, onMounted } from 'vue'
-import apiClient from "../utils/apiClient";
 import axios from "axios";
 
 let data = ref(null)
@@ -49,7 +48,7 @@ onMounted(
 const accounts = [
     {
         accountName: "Student account",
-        iban: "NL24 ABNA 0126 6816 43",
+        iban: "NL24 INHL 0126 6816 43",
         balance: 67.52,
     },
 ];

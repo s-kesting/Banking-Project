@@ -15,12 +15,10 @@ export const useAuthStore = defineStore("auth", {
     actions: {
         async login(username, password) {
             try {
-                const res = await axios.post(`${API_ENDPOINTS.auth}/login`, {
+                const res = await axios.post(API_ENDPOINTS.login, {
                     username,
                     password,
                 });
-
-                // Save token and user info
 
 
 
@@ -44,8 +42,37 @@ export const useAuthStore = defineStore("auth", {
             }
         },
 
+        //FIXME: fix this
+        checkTokenValidity() {
+            if (!this.token) { return false }
+
+            try {
+                // Decode JWT payload (basic check - you might want to use a JWT library)
+                const payload = JSON.parse(atob(token.value.split('.')[1]))
+                const currentTime = Date.now() / 1000
+
+                if (payload.exp < currentTime) {
+                    console.log("logout called3")
+                    this.logout()
+                    return false
+                }
+
+                return true
+            } catch (error) {
+                console.error('Token validation error:', error)
+                this.logout()
+                return false
+            }
+        },
+        //FIXME:: fixthis
+        async initializeAuth() {
+            if (this.token && !this.checkTokenValidity()) {
+                this.logout()
+                console.log("logout called9")
+            }
+        },
         async register({ username, email, password, phoneNumber, bsn }) {
-            await axios.post("/user/auth/register", {
+            await axios.post(API_ENDPOINTS.register, {
                 username,
                 email,
                 password,
@@ -61,17 +88,20 @@ export const useAuthStore = defineStore("auth", {
                 this.user = userData;
                 return userData;
             } catch (err) {
+                console.log("logout called9")
                 this.logout();
                 throw err;
             }
         },
 
         logout() {
+            console.log("user logged out")
             this.token = null;
             this.user = null;
             localStorage.removeItem("token");
             localStorage.removeItem("user");
             delete axios.defaults.headers.common["Authorization"];
+            console.log("user logged out")
         },
     },
 });

@@ -10,7 +10,7 @@
                 </div>
                 <ul class="nav-links">
                     <li>
-                        <router-link to="/">
+                        <router-link to="/test">
                             <i class="fas fa-boxes-stacked"></i> Products
                         </router-link>
                     </li>
@@ -62,32 +62,33 @@ export default {
         const user = computed(() => authStore.user);
 
         // Detect if current route is /auth
-        const isAuthPage = computed(() => route.path === "/");
+        const isAuthPage = computed(() => route.path === "/login");
 
-        onMounted(async () => {
-            const token = localStorage.getItem("token");
-            if (token) {
-                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-                try {
-                    await authStore.getUserData();
-                } catch (err) {
-                    authStore.logout();
-                    router.push("/");
-                }
-            }
-        });
+       // onMounted(
+       //     async () => {
+       //     const token = localStorage.getItem("token");
+       //     if (token) {
+       //         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+       //         try {
+       //             await authStore.getUserData();
+       //         } catch (err) {
+       //             authStore.logout();
+       //             router.push("/");
+       //         }
+       //     }
+       // });
 
-        const logout = () => {
-            authStore.logout();
-            router.push("/");
-        };
+       // const logout = () => {
+       //     authStore.logout();
+       //     router.push("/");
+       // };
 
-        return {
-            isLoggedIn,
-            user,
-            logout,
-            isAuthPage,
-        };
+       // return {
+       //     isLoggedIn,
+       //     user,
+       //     logout,
+       //     isAuthPage,
+       // };
     },
 };
 </script>
