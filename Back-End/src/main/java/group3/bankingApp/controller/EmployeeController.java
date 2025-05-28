@@ -3,7 +3,6 @@ package group3.bankingApp.controller;
 import group3.bankingApp.model.User;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.enums.VerifyStatus;
-import group3.bankingApp.model.UserWithAccounts;
 import group3.bankingApp.repository.UserRepository;
 import group3.bankingApp.repository.AccountRepository;
 
@@ -27,17 +26,23 @@ public class EmployeeController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserWithAccounts>> getUsers(@RequestParam(required = false) String username) {
+    public ResponseEntity<List<Map<String, Object>>> getUsers(@RequestParam(required = false) String username) {
         List<User> users = (username == null || username.isEmpty())
                 ? userRepository.findAll()
                 : userRepository.findByUsernameContainingIgnoreCase(username);
 
-        List<UserWithAccounts> result = users.stream()
-                .map(user -> new UserWithAccounts(user, accountRepository.findByUserId(user.getUserId())))
+        List<Map<String, Object>> result = users.stream()
+                .map(user -> {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("user", user);
+                    data.put("accounts", accountRepository.findByUserId(user.getUserId()));
+                    return data;
+                })
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(result);
     }
+
 
     @PutMapping("/users/{userId}/verify")
     public ResponseEntity<?> updateUserStatus(@PathVariable Integer userId, @RequestBody Map<String, String> payload) {
