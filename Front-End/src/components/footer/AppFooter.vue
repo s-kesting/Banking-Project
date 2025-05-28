@@ -1,6 +1,6 @@
 <template>
   <div class="footer-content">
-    <span>© 2025 ABN AMRO</span>
+    <span>© 2025 INHOLLAND</span>
     <span class="divider">|</span>
     <a href="#">Privacy</a>
     <span class="divider">|</span>
