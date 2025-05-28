@@ -38,8 +38,9 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/api/user/auth/**").permitAll()
-                .requestMatchers("/user/auth/**").permitAll()
+                .requestMatchers("/api/user/auth/register").permitAll()
+                .requestMatchers("/api/user/auth/login").permitAll()   
+                .requestMatchers("/api/user/**").permitAll()
                 .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
                 .anyRequest().authenticated())
             .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),

@@ -17,9 +17,10 @@ public class JwtTokenProvider {
     private final String jwtSecret = "ThisIsASuperStrongJWTSecretKey!123";
     private final long jwtExpirationInMs = 3600000; // 1 hour
 
-    public String createToken(String username, Role role) {
+    public String createToken(String username, Role role,  Long userId) {
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("auth", role.getAuthority());
+        claims.put("userId", userId);
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationInMs);
@@ -28,7 +29,7 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
-                .signWith(SignatureAlgorithm.HS256, jwtSecret.getBytes()) // ✅ now secure
+                .signWith(SignatureAlgorithm.HS256, jwtSecret.getBytes()) //now secure
                 .compact();
     }
 

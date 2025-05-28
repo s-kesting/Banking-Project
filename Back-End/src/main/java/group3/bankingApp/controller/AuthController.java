@@ -50,6 +50,7 @@ public class AuthController {
 
             // Save user
             User savedUser = userRepository.save(user);
+            userRepository.flush(); // Ensures data is written to DB immediately
 
             // Create default accounts (Checking + Saving)
             accountService.createDefaultAccountsForUser(savedUser.getUserId());
@@ -105,13 +106,17 @@ public class AuthController {
              return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet verified");
          }
 
-        String token = jwtTokenProvider.createToken(username, user.getRole());
+        String token = jwtTokenProvider.createToken(username, user.getRole(), user.getUserId().longValue());
         System.out.println("Token generated successfully for: " + username);
 
-        return ResponseEntity.ok(Map.of(
+         return ResponseEntity.ok(Map.of(
+                "success", true,
                 "token", token,
                 "username", username,
-                "role", user.getRole()));
+                "role", user.getRole(),
+                "userId", user.getUserId()
+        ));
+                
     }
 
 }
