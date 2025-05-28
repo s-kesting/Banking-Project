@@ -7,10 +7,16 @@ import axios from "axios";
 
 import Login from "@/components/Authentication.vue";
 import Dashboard from "@/components/DashBoard.vue"; // new route view
+import AdminDashboard from "@/components/AdminDashboard/EmployeeDashboard.vue";
 
 const routes = [
   { path: "/", name: "Login", component: Login },
   { path: "/Dashboard", name: "Dashboard", component: Dashboard },
+  {
+    path: "/AdminDashboard",
+    name: "AdminDashboard",
+    component: AdminDashboard,
+  },
 ];
 
 const router = createRouter({

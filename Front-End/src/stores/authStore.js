@@ -17,7 +17,7 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async login(username, password) {
       try {
-        const res = await axios.post(API_ENDPOINTS.login, {
+        const res = await axios.post(`${API_ENDPOINTS.auth}/login`, {
           username,
           password,
         });
@@ -27,12 +27,16 @@ export const useAuthStore = defineStore("auth", {
         this.user = {
           username: res.data.username,
           role: res.data.role,
-          id: res.data.userId,
+          userId: res.data.userId,
         };
+
+        console.log("Logged in role:", this.user.role);
 
         // Persist in localStorage
         localStorage.setItem("token", this.token);
         localStorage.setItem("user", JSON.stringify(this.user));
+
+        console.log("JWT Token stored:", localStorage.getItem("token"));
 
         // Set axios header for future requests
         axios.defaults.headers.common["Authorization"] = `Bearer ${this.token}`;
@@ -43,7 +47,7 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async register({ username, email, password, phoneNumber, bsn }) {
-      await axios.post("/user/auth/register", {
+      await axios.post(`${API_ENDPOINTS.auth}/register`, {
         username,
         email,
         password,

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import group3.bankingApp.model.User;
 import java.util.Optional; 
+import java.util.List; 
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
@@ -17,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     //List<Publisher> findPublishersWithMinJournalsInLocation(Integer minJournals,String location); 
     // source: https://www.baeldung.com/the-persistence-layer-with-spring-and-jpa
     Optional<User> findByUsername(String username);
+
+    List<User> findByUsernameContainingIgnoreCase(String username);
+
 
 }
 

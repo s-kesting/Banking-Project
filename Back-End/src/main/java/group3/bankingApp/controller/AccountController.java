@@ -4,8 +4,11 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
 
 import group3.bankingApp.model.Account;
 import group3.bankingApp.services.AccountService;
@@ -27,11 +30,12 @@ public class AccountController {
         return accountService.findById(id);
     }
 
-    @Operation(summary = "Get users account by the users ID")
-    @GetMapping("user/{id}")
-    public Account getAccountsByUserId(@ParameterObject int userId) {
+    @Operation(summary = "Get all accounts of a user by their user ID")
+    @GetMapping("/user/{id}")
+    public List<Account> getAccountsByUserId(@PathVariable("id") int userId) {
         return accountService.findUsersAccounts(userId);
     }
+
 
     @Operation(summary = "get all accounts")
     @GetMapping()

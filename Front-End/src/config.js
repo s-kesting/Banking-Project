@@ -1,12 +1,11 @@
-export const API_BASE_URL = "http://localhost:8080/api/";
+// src/config.js
+export const API_BASE_URL = "http://localhost:8080";
 
 export const API_ENDPOINTS = {
-  auth: `${API_BASE_URL}user/auth`,
-  users: `${API_BASE_URL}user`,
-    register: `${API_BASE_URL}user/auth/register`,
-    login: `${API_BASE_URL}user/auth/login`,
-  accounts: `${API_BASE_URL}accounts`,
-  transactions: `${API_BASE_URL}transactions`,
-
+  auth: `${API_BASE_URL}/api/user/auth`,
+  users: `${API_BASE_URL}/api/user`,
+  accounts: `${API_BASE_URL}/accounts`,
+  transactions: `${API_BASE_URL}/transactions`,
+  employee: `${API_BASE_URL}/api/employee`,
 };
 export default API_ENDPOINTS;

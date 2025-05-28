@@ -8,6 +8,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.Customizer;
+
 
 @Configuration
 @EnableMethodSecurity
@@ -29,21 +31,22 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors() // enable global CORS (your CorsConfig)
-            .and()
-            .csrf().disable()
-            .headers().frameOptions().disable() //allow H2 console (uses frames)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeHttpRequests()
-                .requestMatchers("/h2-console/**").permitAll() //allow H2 console
-                .requestMatchers("/api/user/auth/**").permitAll()
-                .anyRequest().authenticated()
-            .and()
+            .cors(Customizer.withDefaults()) //
+            .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/api/user/auth/register").permitAll()
+                .requestMatchers("/api/user/auth/login").permitAll()   
+                .requestMatchers("/api/user/**").permitAll()
+                .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
+                .anyRequest().authenticated())
             .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
                              UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 }
