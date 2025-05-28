@@ -1,4 +1,4 @@
-INSERT INTO ATMSession (userID, login_time) VALUES
+INSERT INTO ATMSession (accountID, login_time) VALUES
 -- Recent ATM sessions (last 7 days)
 (1, '2025-05-21 08:30:15'),
 (5, '2025-05-21 09:45:22'),
