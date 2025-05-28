@@ -7,20 +7,22 @@ export const useAuthStore = defineStore("auth", {
         token: localStorage.getItem("token") || null,
         user: JSON.parse(localStorage.getItem("user")) || null,
     }),
-
     getters: {
         isLoggedIn: (state) => !!state.token,
         userId: (state) => state.user?.id || null,
         userRole: (state) => state.user?.role || null,
     },
-
     actions: {
         async login(username, password) {
             try {
-                const res = await axios.post(API_ENDPOINTS.login, {
+                const res = await axios.post(`${API_ENDPOINTS.auth}/login`, {
                     username,
                     password,
                 });
+
+                // Save token and user info
+
+
 
                 // Save token and user info
                 this.token = res.data.token;

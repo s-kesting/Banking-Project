@@ -42,6 +42,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             } else {
                 System.out.println("[INFO] token was rejected");
             }
+            // System.out.println("Authenticated: " + auth.getName() + ", Authorities: " +
+            // auth.getAuthorities());
         }
 
         System.out.println(response.getStatus());

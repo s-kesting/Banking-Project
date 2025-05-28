@@ -7,10 +7,16 @@ import axios from "axios";
 
 import Login from "@/components/Authentication.vue";
 import Dashboard from "@/components/DashBoard.vue"; // new route view
+import AdminDashboard from "@/components/AdminDashboard/EmployeeDashboard.vue";
 
 const routes = [
   { path: "/", name: "Login", component: Login },
   { path: "/Dashboard", name: "Dashboard", component: Dashboard },
+  {
+    path: "/AdminDashboard",
+    name: "AdminDashboard",
+    component: AdminDashboard,
+  },
 ];
 
 const router = createRouter({
@@ -21,6 +27,13 @@ const router = createRouter({
 // Axios config (optional)
 import { API_BASE_URL } from "@/config";
 axios.defaults.baseURL = API_BASE_URL;
+
+// Automatically set JWT token from localStorage
+const token = localStorage.getItem("token");
+if (token) {
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  console.log("JWT token attached to axios globally");
+}
 
 const app = createApp(App);
 app.use(router);

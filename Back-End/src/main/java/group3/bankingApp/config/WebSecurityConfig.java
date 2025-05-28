@@ -8,6 +8,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.Customizer;
+
 
 @Configuration
 @EnableMethodSecurity
@@ -25,25 +27,25 @@ public class WebSecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    //FIXEME: make sure to change the security filter
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors() // enable global CORS (your CorsConfig)
-            .and()
-            .csrf().disable()
-            .headers().frameOptions().disable() //allow H2 console (uses frames)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeHttpRequests()
-                .requestMatchers("/h2-console/**").permitAll() //allow H2 console
+            .cors(Customizer.withDefaults()) //
+            .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/user/auth/**").permitAll()
-                .anyRequest().authenticated()
-            .and()
+                .requestMatchers("/user/auth/**").permitAll()
+                .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
+                .anyRequest().authenticated())
             .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
                              UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 }
