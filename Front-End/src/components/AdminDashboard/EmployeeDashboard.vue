@@ -51,7 +51,7 @@
         </thead>
         <tbody>
           <template
-            v-for="userWithAccount in filteredUsers"
+            v-for="userWithAccount in paginatedUsers"
             :key="userWithAccount.user.userId"
           >
             <tr>
@@ -109,6 +109,17 @@
       </table>
     </div>
 
+    <!-- 🔁 Pagination -->
+    <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">
+        ⬅️ Previous
+      </button>
+      <span>Page {{ currentPage }} / {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        Next ➡️
+      </button>
+    </div>
+
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
@@ -124,6 +135,9 @@ const errorMessage = ref("");
 const userStatusFilter = ref("ALL");
 const accountStatusFilter = ref("ALL");
 
+const currentPage = ref(1);
+const usersPerPage = 10;
+
 // ✅ Load users
 const fetchUsers = async () => {
   try {
@@ -133,8 +147,7 @@ const fetchUsers = async () => {
       : "";
     const res = await axios.get(`${API_ENDPOINTS.employee}/users${queryParam}`);
     users.value = res.data;
-
-    // 🆕 Set up watchers for each user after data is loaded
+    currentPage.value = 1;
     setupUserStatusWatchers();
   } catch (err) {
     errorMessage.value =
@@ -181,6 +194,29 @@ const filteredUsers = computed(() => {
   });
 });
 
+// Pagination logic
+const paginatedUsers = computed(() => {
+  const start = (currentPage.value - 1) * usersPerPage;
+  const end = start + usersPerPage;
+  return filteredUsers.value.slice(start, end);
+});
+
+const totalPages = computed(() =>
+  Math.ceil(filteredUsers.value.length / usersPerPage)
+);
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
 // ✅ Auto-sync account status when user status changes
 const setupUserStatusWatchers = () => {
   users.value.forEach((userWithAccount) => {
@@ -188,10 +224,7 @@ const setupUserStatusWatchers = () => {
       () => userWithAccount.user.verifyUser,
       (newStatus) => {
         userWithAccount.accounts.forEach((acc) => {
-          if (newStatus === "REJECTED") acc.verifyAccount = "REJECTED";
-          else if (newStatus === "PENDING") acc.verifyAccount = "PENDING";
-          else if (newStatus === "ACTIVE") acc.verifyAccount = "ACTIVE";
-          // ACTIVE: Do not change account status
+          acc.verifyAccount = newStatus;
         });
       }
     );
@@ -282,7 +315,6 @@ button:hover {
   margin-top: 20px;
   text-align: center;
 }
-
 .filters {
   display: flex;
   justify-content: space-between;
@@ -300,5 +332,15 @@ button:hover {
   padding: 6px;
   border-radius: 4px;
   font-size: 14px;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 1rem;
+}
+.pagination button {
+  padding: 6px 12px;
 }
 </style>
