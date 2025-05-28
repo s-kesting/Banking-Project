@@ -123,7 +123,7 @@ export default {
         // Redirect based on role
         const role = authStore.user.role;
         if (role === "EMPLOYEE") {
-          router.push("/AdminDashboard");
+          router.push("/EmployeeOverview");
         } else {
           router.push("/Dashboard");
         }

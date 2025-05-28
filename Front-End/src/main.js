@@ -8,6 +8,7 @@ import axios from "axios";
 import Login from "@/components/Authentication.vue";
 import Dashboard from "@/components/DashBoard.vue"; // new route view
 import AdminDashboard from "@/components/AdminDashboard/EmployeeDashboard.vue";
+import EmployeeOverview from "@/components/AdminDashboard/EmployeeOverview.vue";
 
 const routes = [
   { path: "/", name: "Login", component: Login },
@@ -16,6 +17,11 @@ const routes = [
     path: "/AdminDashboard",
     name: "AdminDashboard",
     component: AdminDashboard,
+  },
+  {
+    path: "/EmployeeOverview",
+    name: "EmployeeOverview",
+    component: EmployeeOverview,
   },
 ];
 
