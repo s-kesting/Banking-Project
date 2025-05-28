@@ -22,9 +22,10 @@ public class JwtTokenProvider {
     private String jwtSecret;
     private final long jwtExpirationInMs = 3600000; // 1 hour
 
-    public String createToken(String username, Role role) {
+    public String createToken(String username, Role role, Long userId) {
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("auth", role.getAuthority());
+        claims.put("userId", userId);
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationInMs);
