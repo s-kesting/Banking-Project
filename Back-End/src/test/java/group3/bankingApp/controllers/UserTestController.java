@@ -2,6 +2,7 @@ package group3.bankingApp.controllers;
 
 import group3.bankingApp.controller.UserController;
 import group3.bankingApp.model.User;
+import group3.bankingApp.security.JwtTokenProvider;
 import group3.bankingApp.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
-@WithMockUser
+@WithMockUser 
 public class UserTestController {
 
     @Autowired
@@ -34,6 +34,9 @@ public class UserTestController {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void setUp() {
