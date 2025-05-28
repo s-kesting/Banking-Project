@@ -28,6 +28,13 @@ const router = createRouter({
 import { API_BASE_URL } from "@/config";
 axios.defaults.baseURL = API_BASE_URL;
 
+// Automatically set JWT token from localStorage
+const token = localStorage.getItem("token");
+if (token) {
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  console.log("JWT token attached to axios globally");
+}
+
 const app = createApp(App);
 app.use(router);
 app.use(createPinia());
