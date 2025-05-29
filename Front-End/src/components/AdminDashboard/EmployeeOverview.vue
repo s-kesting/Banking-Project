@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <button @click="goToDetail" class="detail-btn">More Info</button>
+    <router-link to="/admindashboard" class="detail-btn">More Info</router-link>
 
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
@@ -34,7 +34,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import  apiClient  from "@/utils/apiClient";
 import { useRouter } from "vue-router";
 import { API_ENDPOINTS } from "@/config";
 
@@ -46,7 +46,7 @@ const router = useRouter();
 const fetchOverviewData = async () => {
   try {
     errorMessage.value = "";
-    const res = await axios.get(`${API_ENDPOINTS.employee}/users`);
+    const res = await apiClient.get(`${API_ENDPOINTS.employee}/users`);
     const users = res.data;
 
     // Reset

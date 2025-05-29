@@ -5,6 +5,9 @@ import App from '@/App.vue'
 import AdminDashboard from '@/components/AdminDashboard/EmployeeDashboard.vue'
 import DashBoard from '@/components/DashBoard.vue'
 import Authentication from '@/components/Authentication.vue'
+import EmployeeOverview from '@/components/AdminDashboard/EmployeeOverview.vue'
+
+let employeeRoutes = []
 
 const routes = [
     {
@@ -12,6 +15,15 @@ const routes = [
         name: 'Login',
         component: Authentication,
         meta: { requiresGuest: true }
+    },
+    {
+        path: '/employee_overview',
+        name: 'EmployeeOverview',
+        component: EmployeeOverview,
+        meta: {
+            requiresAuth: true,
+            requiresRole: "EMPLOYEE"
+        }
     },
     {
         path: '/dashboard',
@@ -66,8 +78,8 @@ router.beforeEach((to, from, next) => {
             console.log(authStore.userRole);
             let status = authStore.userRole;
             if (authStore.userRole === "EMPLOYEE") {
-                if (to.path !== '/admindashboard') {
-                    next('/admindashboard')
+                if (meta.path !== '/employee_overview') {
+                    next('/employee_overview')
                     return
                 }
             }
