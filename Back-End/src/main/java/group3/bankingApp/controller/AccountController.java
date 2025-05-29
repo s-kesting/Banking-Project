@@ -1,6 +1,8 @@
 package group3.bankingApp.controller;
 
 import org.springframework.security.core.Authentication;
+import java.util.List;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 import group3.bankingApp.model.Account;
@@ -43,7 +46,6 @@ public class AccountController {
         List<Account> accounts = accountService.findUsersAccounts(userId);
         System.out.println(accounts);
         return new ResponseEntity<>(accounts, HttpStatus.OK);
-
     }
 
     @Operation(summary = "get all accounts")
