@@ -6,7 +6,7 @@
 
         <template #main>
             <h2>My current accounts</h2>
-            <AccountList :accounts="getAccounts" />
+            <AccountList :accounts="accounts" />
         </template>
     </MainLayout>
 </template>
@@ -18,22 +18,22 @@ import AccountList from "@/components/accounts/AccountList.vue";
 import API_ENDPOINTS from "@/config";
 import { useAuthStore } from '@/stores/authStore.js'
 import { ref, onMounted } from 'vue'
-import axios from "axios";
+import apiClient from "../utils/apiClient";
 
 let data = ref(null)
 let loading = ref(false)
 let error = ref(null)
-let getAccounts = ref(null)
+let accounts = ref(null)
 
-let authStore = useAuthStore()
 
 onMounted(
     async () => {
         try {
+            const authStore = useAuthStore()
             loading.value = true
-            const response = await apiClient.get(`${API_ENDPOINTS.userAccounts}/${authStore.userId}`)
+            const response = await apiClient.get(`${API_ENDPOINTS.userAccounts}`)
             console.log(response.data)
-            data.value = response.data
+            accounts.value = response.data
         } catch (err) {
             error.value = err.message
             console.log(err.message)
@@ -45,11 +45,4 @@ onMounted(
 
 
 
-const accounts = [
-    {
-        accountName: "Student account",
-        iban: "NL24 INHL 0126 6816 43",
-        balance: 67.52,
-    },
-];
 </script>

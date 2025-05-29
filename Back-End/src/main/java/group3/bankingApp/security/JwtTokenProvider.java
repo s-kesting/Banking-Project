@@ -4,6 +4,9 @@ import group3.bankingApp.model.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,12 +24,12 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String jwtSecret;
     private final long jwtExpirationInMs = 3600000; // 1 hour
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     public String createToken(String username, Role role, Long userId) {
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("auth", role.getAuthority());
         claims.put("userId", userId);
-
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationInMs);
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
@@ -44,10 +47,10 @@ public class JwtTokenProvider {
                     .setSigningKey(jwtSecret.getBytes())
                     .build()
                     .parseClaimsJws(token);
-            System.out.println("[INFO] JWT token validated");
+            logger.info("JWT token validation succeded");
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            System.out.println("[INFO] JWT token validation failed");
+            logger.info("JWT token validation failed");
             return false;
         }
     }

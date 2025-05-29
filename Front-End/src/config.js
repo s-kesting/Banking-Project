@@ -6,8 +6,8 @@ export const API_ENDPOINTS = {
     users: `${API_BASE_URL}user`,
     register: `${API_BASE_URL}user/auth/register`,
     login: `${API_BASE_URL}user/auth/login`,
-    accounts: `${API_BASE_URL}accounts`,
-    userAccounts: `${API_BASE_URL}accounts/user`,
+    account: `${API_BASE_URL}account`,
+    userAccounts: `${API_BASE_URL}account/user`,
     transactions: `${API_BASE_URL}transactions`,
     employee: `${API_BASE_URL}employee`,
 

@@ -56,7 +56,7 @@
         </div>
     </div>
 
-    </template>
+</template>
 <script>
 import { ref } from "vue";
 import { useRouter, useRoute } from 'vue-router';
@@ -66,53 +66,53 @@ import axios from "axios";
 
 
 export default {
-  name: "Auth",
-  setup() {
-        const router = useRouter()
-const route = useRoute()
-    const isLogin = ref(true);
-    const email = ref("");
-    const username = ref("");
-    const password = ref("");
-    const phoneNumber = ref(""); // FIXED
-    const bsn = ref(""); //  FIXED
-    const error = ref("");
-    const successMessage = ref("");
+    name: "Auth",
+    setup() {
+        const router = useRouter();
+        const route = useRoute()
+        const isLogin = ref(true);
+        const email = ref("");
+        const username = ref("");
+        const password = ref("");
+        const phoneNumber = ref(""); // FIXED
+        const bsn = ref(""); //  FIXED
+        const error = ref("");
+        const successMessage = ref("");
 
         const authStore = useAuthStore();
 
-    const handleLogin = async () => {
-      error.value = "";
-      successMessage.value = "";
+        const handleLogin = async () => {
+            error.value = "";
+            successMessage.value = "";
 
-      try {
-        await authStore.login(username.value, password.value);
+            try {
+                await authStore.login(username.value, password.value);
                 console.log('successfull login')
                 router.push('/dashboard')
             } catch (err) {
-        if (err.response?.status === 403) {
-          error.value = "Login failed - User not verified yet";
-        } else if (err.response?.status === 401) {
-          error.value = "Login failed - Invalid username or password";
-        } else {
-          error.value = err.response?.data || "Login failed.";
-        }
-      }
-    };
+                if (err.response?.status === 403) {
+                    error.value = "Login failed - User not verified yet";
+                } else if (err.response?.status === 401) {
+                    error.value = "Login failed - Invalid username or password";
+                } else {
+                    error.value = err.response?.data || "Login failed.";
+                }
+            }
+        };
 
         const handleRegister = async () => {
             error.value = "";
 
-      if (!username.value.trim()) {
-        error.value = "Username cannot be empty.";
-        return;
-      }
+            if (!username.value.trim()) {
+                error.value = "Username cannot be empty.";
+                return;
+            }
 
-      const phonePattern = /^06\d{8}$/;
-      if (!phonePattern.test(phoneNumber.value)) {
-        error.value = "Phone number must start with 06 and be 10 digits.";
-        return;
-      }
+            const phonePattern = /^06\d{8}$/;
+            if (!phonePattern.test(phoneNumber.value)) {
+                error.value = "Phone number must start with 06 and be 10 digits.";
+                return;
+            }
 
             const bsnPattern = /^\d{9}$/;
             if (!bsnPattern.test(bsn.value)) {
