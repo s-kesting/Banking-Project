@@ -1,4 +1,5 @@
 package group3.bankingApp.services;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -31,4 +32,9 @@ public class TransactionService {
         return transactionRepository.save(transaction);
         
     }
+
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();
+    }
+
 }
