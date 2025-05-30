@@ -44,8 +44,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             } else {
                 logger.info("JWT token rejected");
             }
-            // System.out.println("Authenticated: " + auth.getName() + ", Authorities: " +
-            // auth.getAuthorities());
         }
         logger.info("request url:" + request.getRequestURI());
         filterChain.doFilter(request, response);

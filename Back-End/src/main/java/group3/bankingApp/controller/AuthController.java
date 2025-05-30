@@ -69,7 +69,6 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
 
         // FIXME: dont call repository through the controller, use a service class
-        //
 
         String username = request.get("username");
         String password = request.get("password");

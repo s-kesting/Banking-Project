@@ -67,7 +67,8 @@ router.beforeEach((to, from, next) => {
     // Check if route requires authentication
     if (to.meta.requiresAuth) {
 
-        if (!authStore.isLoggedIn) {
+        if (!authStore.checkTokenValidity()) {
+            authStore.logout()
             next('/login')
             return
         }
@@ -89,14 +90,6 @@ router.beforeEach((to, from, next) => {
 
             }
         }
-        // Check role-based access
-        //        if (to.meta.requiresRole && authStore.userRole == "EMPLOYEE") {
-        //            next('/admindashboard')
-        //            return
-        //        } else if (to.meta.requiresRole && authStore.userRole == "CUSTOMER") {
-        //            next('/dashboard')
-        //            return
-        //        }
     }
 
     // Redirect authenticated users away from guest-only pages
