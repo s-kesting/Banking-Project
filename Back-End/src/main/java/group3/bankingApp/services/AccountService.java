@@ -21,6 +21,10 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+    public List<Account> findByUserIdAndAccountType(int userId, AccountType accountType) {
+        return accountRepository.findByUserIdAndAccountType(userId, accountType);
+    }
+
     public Account save(Account account) {
         return accountRepository.save(account);
     }

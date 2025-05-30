@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import group3.bankingApp.model.Account;
+import group3.bankingApp.model.enums.AccountType;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
@@ -26,5 +27,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     void deposit(@Param("id") Integer id, @Param("amount") double amount);
 
     List<Account> findByUserId(int userId);
+
+    List<Account> findByUserIdAndAccountType(int userId, AccountType accountType);
 
 }

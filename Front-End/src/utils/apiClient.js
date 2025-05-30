@@ -1,7 +1,6 @@
 // utils/apiClient.js
 import axios from 'axios'
 import useAuthStore from '@/stores/authStore'
-import { API_BASE_URL } from '../config'
 
 /*
  * creates an axios client preconfigured to handle the JWT token
