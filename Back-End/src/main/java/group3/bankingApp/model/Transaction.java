@@ -15,6 +15,7 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "TRANSACTIONID", nullable = false)
     private Integer transactionId;
 
     @Column(name = "SENDER_ACCOUNT", nullable = false)

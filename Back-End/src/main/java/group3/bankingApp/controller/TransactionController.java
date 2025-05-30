@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import group3.bankingApp.DTO.TransactionDTO;
 import group3.bankingApp.model.Transaction;
 import group3.bankingApp.services.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,10 +34,11 @@ public class TransactionController {
     }
 
     @GetMapping("/allTransactions")
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> transactions = transactionService.getAllTransactions();
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions() {
+        List<TransactionDTO> transactions = transactionService.getAllTransactionDTOs();
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
+
 
 
 }
