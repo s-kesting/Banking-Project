@@ -44,28 +44,35 @@ export const useAuthStore = defineStore("auth", {
         },
 
         checkTokenValidity() {
-            if (!this.token) { return false }
+            if (!this.token) {
+                console.log('JWT token not present')
+                return false;
+            }
 
             try {
-                // Decode JWT payload (basic check - you might want to use a JWT library)
-                const payload = JSON.parse(atob(token.value.split('.')[1]))
-                const currentTime = Date.now() / 1000
-
-                if (payload.exp < currentTime) {
-                    this.logout()
-                    return false
+                const parts = this.token.split('.');
+                console.log(parts)
+                if (parts.length !== 3) {
+                    console.log('JWT token in wrong format')
+                    return false;
                 }
 
-                return true
+                const payload = JSON.parse(atob(parts[1]));
+
+
+                const currentTime = Math.floor(Date.now() / 1000);
+
+                if (payload.exp < currentTime) {
+                    console.log(payload.exp)
+                    console.log(currentTime)
+                    console.log('JWT token expired')
+                    return false
+                } else {
+                    return true
+                }
+
             } catch (error) {
-                console.error('Token validation error:', error)
-                this.logout()
-                return false
-            }
-        },
-        async initializeAuth() {
-            if (this.token && !this.checkTokenValidity()) {
-                this.logout()
+                return false;
             }
         },
         async getUserData() {
