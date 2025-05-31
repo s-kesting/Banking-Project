@@ -15,9 +15,10 @@ public class ATMSession {
     @Id
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "SESSIONID")
     private Integer sessionId;
 
-    @Column(nullable = false)
+    @Column(name = "ACCOUNTID", nullable = false)
     private Integer accountId; // FK to account.accountId
 
     @Column(name = "LOGIN_TIME", nullable = false)

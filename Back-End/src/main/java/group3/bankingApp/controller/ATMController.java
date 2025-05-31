@@ -1,11 +1,45 @@
 package group3.bankingApp.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import group3.bankingApp.model.ATMSession;
+import group3.bankingApp.services.ATMService;
+
+import group3.bankingApp.model.Transaction;
+import org.springframework.http.HttpStatus;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/ATM")
 public class ATMController {
 
+    private final ATMService atmService;
+
+    public ATMController(ATMService atmService) {
+        this.atmService = atmService;
+    }
+
+    @PostMapping("/start-session")
+    public ResponseEntity<ATMSession> startSession(@RequestBody Map<String, Object> request) {
+        Integer accountId = (Integer) request.get("accountId");
+        ATMSession session = atmService.startSession(accountId);
+        return ResponseEntity.ok(session);
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<?> transfer(@RequestBody Map<String, Object> request) {
+        try {
+            Integer sessionId = (Integer) request.get("sessionId");
+            Integer targetAccountId = (Integer) request.get("targetAccountId");
+            Double amount = ((Number) request.get("amount")).doubleValue();
+            String description = (String) request.getOrDefault("description", "");
+
+            Transaction transaction = atmService.transfer(sessionId, targetAccountId, amount, description);
+            return ResponseEntity.ok(transaction);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }

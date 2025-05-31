@@ -39,10 +39,19 @@ public class WebSecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/user/auth/register").permitAll()
-                .requestMatchers("/api/user/auth/login").permitAll()   
+                .requestMatchers("/api/user/auth/login").permitAll()
                 .requestMatchers("/api/user/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // ✅ Swagger allowed
                 .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
+
+                //testing purposes (robben bench over)
+                .requestMatchers("/api/ATM/start-session").permitAll()
+                .requestMatchers("/api/ATM/transfer").permitAll()
+
+
+
                 .anyRequest().authenticated())
+
             .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
                              UsernamePasswordAuthenticationFilter.class);
 
