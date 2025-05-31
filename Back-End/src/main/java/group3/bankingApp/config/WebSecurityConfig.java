@@ -10,7 +10,6 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.Customizer;
 
-
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig {
@@ -27,7 +26,8 @@ public class WebSecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    //FIXEME: make sure to change the security filter
+
+    // FIXEME: make sure to change the security filter
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

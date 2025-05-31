@@ -43,7 +43,6 @@ public class EmployeeController {
         return ResponseEntity.ok(result);
     }
 
-
     @PutMapping("/users/{userId}/verify")
     public ResponseEntity<?> updateUserStatus(@PathVariable Integer userId, @RequestBody Map<String, String> payload) {
         Optional<User> optionalUser = userRepository.findById(userId);

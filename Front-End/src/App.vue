@@ -9,21 +9,43 @@
           Banking Application
         </div>
         <ul class="nav-links">
-          <li>
-            <router-link to="/">
-              <i class="fas fa-boxes-stacked"></i> Products
-            </router-link>
-          </li>
-          <li>
-            <router-link to="/self-service">
-              <i class="fas fa-tools"></i> Self service
-            </router-link>
-          </li>
-          <li>
-            <router-link to="/tasklist">
-              <i class="fas fa-clipboard-check"></i> Tasklist
-            </router-link>
-          </li>
+          <!-- Show employee-specific links -->
+          <template v-if="user?.role === 'EMPLOYEE'">
+            <li>
+              <router-link to="/employee_overview">
+                <i class="fas fa-chart-line"></i> Dashboard
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/admindashboard">
+                <i class="fas fa-users-cog"></i> User & Account Management
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/employee_transaction">
+                <i class="fas fa-exchange-alt"></i> Transaction Management
+              </router-link>
+            </li>
+          </template>
+
+          <!-- Show regular customer links -->
+          <template v-else>
+            <li>
+              <router-link to="/test">
+                <i class="fas fa-boxes-stacked"></i> Products
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/self-service">
+                <i class="fas fa-tools"></i> Self Service
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/tasklist">
+                <i class="fas fa-clipboard-check"></i> Tasklist
+              </router-link>
+            </li>
+          </template>
         </ul>
       </div>
 
@@ -61,15 +83,15 @@ export default {
     const isLoggedIn = computed(() => authStore.isLoggedIn);
     const user = computed(() => authStore.user);
 
-    // Detect if current route is /auth
-    const isAuthPage = computed(() => route.path === "/");
+    const isAuthPage = computed(() => route.path === "/login");
 
+    // Handle login state and token persistence
     onMounted(async () => {
       const token = localStorage.getItem("token");
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         try {
-          await authStore.fetchMe();
+          await authStore.getUserData();
         } catch (err) {
           authStore.logout();
           router.push("/");
