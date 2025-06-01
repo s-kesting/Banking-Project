@@ -3,7 +3,6 @@
     <div class="account-list">
         <AccountCard v-for="account in accounts" :key="account.iban" :account-name="account.accountType"
             :iban="account.iban" :balance="account.balance" />
-        <NewAccountButton />
     </div>
 </template>
 

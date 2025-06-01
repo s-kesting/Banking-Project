@@ -48,6 +48,10 @@ public class AccountService {
         return accountRepository.findAll(pageable);
     }
 
+    public void newAccountRequest(int userId, AccountType accountType) {
+        createAccount(userId, accountType);
+    }
+
     public void createDefaultAccountsForUser(Integer userId) {
         createAccount(userId, AccountType.Checking);
         createAccount(userId, AccountType.Saving);

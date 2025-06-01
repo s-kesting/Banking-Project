@@ -24,15 +24,18 @@ import TopNav from "./layout/TopNav.vue";
 import AppFooter from "./footer/AppFooter.vue";
 import SidebarNavigation from "@/components/navigation/SideBarNavigation.vue";
 import AccountList from "@/components/accounts/AccountList.vue";
-import { ref, onMounted, shallowRef } from 'vue'
+import { ref, shallowRef } from 'vue'
 import SavingsAccount from "./accounts/SavingsAccount.vue";
+import CheckingsAccount from "./accounts/CheckingsAccount.vue";
+import CreateAccount from "./accounts/CreateAccount.vue";
 
 let content = shallowRef(AccountList)
-let activeItem = ref("Pay")
+let activeItem = ref("Overview")
 const items = {
     "Overview": AccountList,
-    "Pay": TopNav,
-    "Save": SavingsAccount,
+    "Checkings": CheckingsAccount,
+    "Savings": SavingsAccount,
+    "New account": CreateAccount
 };
 function setComponent(component) {
     content.value = component
