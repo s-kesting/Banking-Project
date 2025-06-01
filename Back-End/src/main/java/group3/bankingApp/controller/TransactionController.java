@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import group3.bankingApp.DTO.EmployeeTransferRequest;
 import group3.bankingApp.DTO.TransactionDTO;
 import group3.bankingApp.model.Transaction;
 import group3.bankingApp.services.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -38,6 +40,17 @@ public class TransactionController {
         List<TransactionDTO> transactions = transactionService.getAllTransactionDTOs();
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
+
+        @PostMapping("/employee-transfer")
+    public ResponseEntity<?> employeeTransfer(@RequestBody EmployeeTransferRequest req) {
+        try {
+            Transaction tx = transactionService.transferFundsAsEmployee(req);
+            return ResponseEntity.ok(tx);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
 
 
 
