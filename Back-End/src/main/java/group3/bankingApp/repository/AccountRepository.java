@@ -30,4 +30,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     
     Optional<Account> findByIBAN(String IBAN);
 
+    //Check whether bank number is exist
+    boolean existsByIBAN(String IBAN);      
+
 }
