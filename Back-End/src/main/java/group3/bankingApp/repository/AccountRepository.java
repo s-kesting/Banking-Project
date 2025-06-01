@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 import group3.bankingApp.model.Account;
 
 @Repository
@@ -26,5 +27,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     void deposit(@Param("id") Integer id, @Param("amount") double amount);
 
     List<Account> findByUserId(int userId);
+    
+    Optional<Account> findByIBAN(String IBAN);
 
 }

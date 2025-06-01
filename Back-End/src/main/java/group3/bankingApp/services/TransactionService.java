@@ -1,6 +1,8 @@
 package group3.bankingApp.services;
+import group3.bankingApp.DTO.EmployeeTransferRequest;
 import group3.bankingApp.DTO.TransactionDTO;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.Transaction;
 import group3.bankingApp.model.User;
+import group3.bankingApp.model.enums.AccountType;
 import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -77,5 +80,41 @@ public class TransactionService {
 
         return dtoList;
     }
+
+    @Transactional
+    public Transaction transferFundsAsEmployee(EmployeeTransferRequest req) {
+        Account sender = accountRepository.findByIBAN(req.getSenderIBAN())
+            .orElseThrow(() -> new IllegalArgumentException("Sender IBAN is invalid"));
+
+        Account receiver = accountRepository.findByIBAN(req.getReceiverIBAN())
+            .orElseThrow(() -> new IllegalArgumentException("Receiver IBAN is invalid"));
+
+        if (sender.getAccountType() != AccountType.Checking || receiver.getAccountType() != AccountType.Checking) {
+            throw new IllegalArgumentException("Only CHECKING accounts are allowed for transfers");
+        }
+
+        double remainingBalance = sender.getBalance() - req.getAmount();
+        if (remainingBalance < sender.getAbsoluteLimit()) {
+            throw new IllegalArgumentException("Sender balance is not sufficient for this transaction");
+        }
+
+        // Withdraw and deposit
+        sender.setBalance(sender.getBalance() - req.getAmount());
+        receiver.setBalance(receiver.getBalance() + req.getAmount());
+
+        accountRepository.save(sender);
+        accountRepository.save(receiver);
+
+        // Save transaction
+        Transaction tx = new Transaction();
+        tx.setSenderAccount(sender.getAccountId());
+        tx.setReceiverAccount(receiver.getAccountId());
+        tx.setAmount(req.getAmount());
+        tx.setDescription(req.getDescription());
+        tx.setCreatedAt(LocalDateTime.now());
+
+        return transactionRepository.save(tx);
+    }
+
 
 }

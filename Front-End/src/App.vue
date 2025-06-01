@@ -26,6 +26,11 @@
                 <i class="fas fa-exchange-alt"></i> Transaction Management
               </router-link>
             </li>
+            <li>
+              <router-link to="/employee_transfering">
+                <i class="fas fa-exchange-alt"></i> Transfering Fund
+              </router-link>
+            </li>
           </template>
 
           <!-- Show regular customer links -->
