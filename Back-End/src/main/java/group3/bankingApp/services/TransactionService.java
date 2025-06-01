@@ -1,18 +1,20 @@
 package group3.bankingApp.services;
-import group3.bankingApp.DTO.TransactionDTO;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
+import group3.bankingApp.DTO.TransactionDTO;
+import group3.bankingApp.DTO.TransactionRequestDTO;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.Transaction;
 import group3.bankingApp.model.User;
 import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.repository.TransactionRepository;
-import jakarta.transaction.Transactional;
 import group3.bankingApp.repository.UserRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class TransactionService {
@@ -31,14 +33,69 @@ public class TransactionService {
     }
 
     @Transactional
-    public Transaction CreateTransaction(Transaction transaction){
-        //sender
-        accountRepository.withdraw(transaction.getSenderAccount(), transaction.getAmount());
-        //receiver
-        accountRepository.deposit(transaction.getReceiverAccount(),transaction.getAmount());
-        //save transaction record
+    public Transaction createAndRecordFromRequest(TransactionRequestDTO request) {
+        validateRequest(request);
+
+        Account sender = searchAccountByIban(request.getSenderIban(), "Sender IBAN not found");
+        Account receiver = searchAccountByIban(request.getReceiverIban(), "Receiver IBAN not found");
+
+        preventSelfTransfer(sender, receiver);
+        checkAbsoluteLimit(sender, request.getAmount());
+
+        updateBalances(sender, receiver, request.getAmount());
+
+        Transaction transaction = buildTransaction(sender, receiver, request);
         return transactionRepository.save(transaction);
-        
+    }
+    //private helper method for transaction
+    //check IBAN and amount
+     private void validateRequest(TransactionRequestDTO request) {
+        if (request.getAmount() <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        if (request.getSenderIban() == null || request.getSenderIban().isBlank()) {
+            throw new IllegalArgumentException("Sender IBAN must be provided");
+        }
+        if (request.getReceiverIban() == null || request.getReceiverIban().isBlank()) {
+            throw new IllegalArgumentException("Receiver IBAN must be provided");
+        }
+    }
+    //search for IBAN
+     private Account searchAccountByIban(String iban, String errorMessage) {
+        return accountRepository
+            .findByIBAN(iban)
+            .orElseThrow(() -> new NoSuchElementException(errorMessage));
+    }
+
+    //avoid sending fund to yourself
+     private void preventSelfTransfer(Account sender, Account receiver) {
+        if (sender.getAccountId().equals(receiver.getAccountId())) {
+            throw new IllegalArgumentException("Cannot transfer to the same account");
+        }
+    }
+
+     private void checkAbsoluteLimit(Account sender, double amount) {
+        double newBalance = sender.getBalance() - amount;
+        if (newBalance < sender.getAbsoluteLimit()) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
+    }
+
+    private void updateBalances(Account sender, Account receiver, double amount) {
+        sender.setBalance(sender.getBalance() - amount);
+        receiver.setBalance(receiver.getBalance() + amount);
+        accountRepository.save(sender);
+        accountRepository.save(receiver);
+    }
+
+   private Transaction buildTransaction(Account sender, Account receiver, TransactionRequestDTO request) {
+        Transaction transaction = new Transaction();
+        transaction.setSenderAccount(sender.getAccountId());
+        transaction.setReceiverAccount(receiver.getAccountId());
+        transaction.setAmount(request.getAmount());
+        transaction.setDescription(request.getDescription());
+        transaction.setCreatedAt(LocalDateTime.now());
+        return transaction;
     }
 
     public List<Transaction> getAllTransactions() {

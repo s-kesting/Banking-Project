@@ -1,5 +1,7 @@
 package group3.bankingApp.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import group3.bankingApp.DTO.TransactionDTO;
+import group3.bankingApp.DTO.TransactionRequestDTO;
 import group3.bankingApp.model.Transaction;
 import group3.bankingApp.services.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -27,10 +29,12 @@ public class TransactionController {
     }
 
     @Operation(summary = "Create a new transaction (transfer money)", description = "sender, receiver, and records the transaction.")
-    @PostMapping
-    public ResponseEntity<Transaction> postTransaction(@RequestBody Transaction transaction) {
-        Transaction createTransaction = transactionService.CreateTransaction(transaction);
-        return new ResponseEntity<>(createTransaction, HttpStatus.CREATED);
+    @PostMapping("/user")
+    public ResponseEntity<Transaction> createTransactionForUser(
+            @RequestBody TransactionRequestDTO requestDto
+    ) {
+        Transaction savedTx = transactionService.createAndRecordFromRequest(requestDto);
+        return new ResponseEntity<>(savedTx, HttpStatus.CREATED);
     }
 
     @GetMapping("/allTransactions")
