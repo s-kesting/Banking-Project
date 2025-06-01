@@ -61,11 +61,19 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    // Example IBAN generator
-    private String generateIban() {
-        String prefix = "NL91ABNA";
-        String numbers = String.format("%010d", new Random().nextInt(1_000_000_000));
-        return prefix + numbers;
+    // IBAN generator
+    public String generateIban() {
+        String bankCode = "INHO0";
+        Random random = new Random();
+        String iban;
+
+        do {
+            String checkDigits = String.format("%02d", random.nextInt(100)); // Random 2 digits
+            String accountNumber = String.format("%09d", random.nextInt(1_000_000_000)); // 9 digits
+            iban = "NL" + checkDigits + bankCode + accountNumber;
+        } while (accountRepository.existsByIBAN(iban)); // ensure uniqueness
+
+        return iban;
     }
 
 }
