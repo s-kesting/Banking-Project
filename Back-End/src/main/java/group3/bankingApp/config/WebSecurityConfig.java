@@ -10,7 +10,6 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.Customizer;
 
-
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig {
@@ -27,24 +26,28 @@ public class WebSecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    //FIXEME: make sure to change the security filter
+
+    // FIXEME: make sure to change the security filter
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults()) //
-            .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/api/user/auth/register").permitAll()
-                .requestMatchers("/api/user/auth/login").permitAll()   
-                .requestMatchers("/api/user/**").permitAll()
-                .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
-                .anyRequest().authenticated())
-            .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
-                             UsernamePasswordAuthenticationFilter.class);
+                .cors(Customizer.withDefaults()) //
+                .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/**").permitAll()
+                        .requestMatchers("/api/user/auth/register").permitAll()
+                        .requestMatchers("/api/user/auth/login").permitAll()
+
+                        .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
+                        .anyRequest().authenticated())
+                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
