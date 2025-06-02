@@ -14,4 +14,5 @@ INSERT INTO users (password, phoneNumber, username, role, bsn, email, verify_use
 ('$2a$10$Rknx/J/fOtsLC3xRR9AHzeN.g0YIMj94C2SV3h4QvTObaZV5eVro.', '06-43567890', 'technician3', 'EMPLOYEE', NULL, 'tech3@example.com', 'ACTIVE'),
 ('$2a$10$Rknx/J/fOtsLC3xRR9AHzeN.g0YIMj94C2SV3h4QvTObaZV5eVro.', '06-54678901', 'jennifer_lee', 'CUSTOMER', '678901238', 'jennifer.lee@example.com', 'ACTIVE'),
 ('$2a$10$Rknx/J/fOtsLC3xRR9AHzeN.g0YIMj94C2SV3h4QvTObaZV5eVro.', '06-65789012', 'michael_taylor', 'CUSTOMER', '789012349', 'michael.taylor@example.com', 'REJECTED');
+('$2a$10$Rknx/J/fOtsLC3xRR9AHzeN.g0YIMj94C2SV3h4QvTObaZV5eVro.', '06-12345678', 'rob', 'CUSTOMER', '123456789', 'rob@123.com', 'ACTIVE');
 -- all passwords set to: password
