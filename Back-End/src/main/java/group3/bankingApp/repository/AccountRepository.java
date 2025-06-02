@@ -30,4 +30,5 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     //search for IBAN
     Optional<Account> findByIBAN(String IBAN);
+    
 }

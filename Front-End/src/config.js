@@ -10,7 +10,6 @@ export const API_ENDPOINTS = {
     userAccounts: `${API_BASE_URL}account/user`,
     transactions: `${API_BASE_URL}transactions`,
     employee: `${API_BASE_URL}employee`,
-
-
+    usertransaction: `${API_BASE_URL}transactions/user`,
 };
 export default API_ENDPOINTS;

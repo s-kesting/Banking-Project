@@ -1,48 +1,73 @@
 <template>
-    <MainLayout>
-        <template #sidebar>
-            <SidebarNavigation activeItem="Pay" />
-        </template>
+  <MainLayout>
+    <template #sidebar>
+      <SideBarNavigation
+        :activeItem="activeItem"
+        @navigate="onNavigate"
+      />
+    </template>
 
-        <template #main>
-            <h2>My current accounts</h2>
-            <AccountList :accounts="accounts" />
-        </template>
-    </MainLayout>
+    <template #main>
+      <!-- show account list only when activeItem is Overview -->
+      <h2 v-if="activeItem === 'Overview'">My current accounts</h2>
+      <AccountList
+        v-if="activeItem === 'Overview'"
+        :accounts="accounts"
+      />
+
+      <!-- when pay is clicked, this view is replaced by the router -->
+      <router-view v-if="activeItem === 'Pay'" />
+      
+      <!-- If/when you add “Save” later: -->
+      <div v-if="activeItem === 'Save'">
+        <p>Save functionality coming soon.</p>
+      </div>
+    </template>
+  </MainLayout>
 </template>
 
 <script setup>
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import MainLayout from "@/components/layout/MainLayout.vue";
-import SidebarNavigation from "@/components/navigation/SideBarNavigation.vue";
+import SideBarNavigation from "./navigation/SideBarNavigation.vue";
 import AccountList from "@/components/accounts/AccountList.vue";
 import API_ENDPOINTS from "@/config";
-import { useAuthStore } from '@/stores/authStore.js'
-import { ref, onMounted } from 'vue'
-import apiClient from "../utils/apiClient";
+import { useAuthStore } from "@/stores/authStore.js";
+import apiClient from "@/utils/apiClient";
 
-let data = ref(null)
-let loading = ref(false)
-let error = ref(null)
-let accounts = ref(null)
+const router = useRouter();
+const activeItem = ref("Overview");
+const accounts = ref(null);
+const loading = ref(false);
+const error = ref(null);
 
+// Called when the click on sidebar
+function onNavigate(item) {
+  activeItem.value = item;
 
-onMounted(
-    async () => {
-        try {
-            const authStore = useAuthStore()
-            loading.value = true
-            const response = await apiClient.get(`${API_ENDPOINTS.userAccounts}`)
-            console.log(response.data)
-            accounts.value = response.data
-        } catch (err) {
-            error.value = err.message
-            console.log(err.message)
-        } finally {
-            loading.value = false
-        }
-    }
-)
+  if (item === "Pay") {
 
+    router.push({ name: "UserTransaction" });
+  } else if (item === "Overview") {
 
+    router.push({ name: "Dashboard" });
+  }
+  
+}
 
+// Fetch accounts 
+onMounted(async () => {
+  try {
+    loading.value = true;
+    const authStore = useAuthStore();
+    const response = await apiClient.get(`${API_ENDPOINTS.userAccounts}`);
+    accounts.value = response.data;
+  } catch (err) {
+    error.value = err.message;
+    console.log(err.message);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
