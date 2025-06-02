@@ -8,7 +8,7 @@ import Authentication from "@/components/Authentication.vue";
 import EmployeeOverview from "@/components/AdminDashboard/EmployeeOverview.vue";
 import EmployeeTransaction from "@/components/AdminDashboard/EmployeeTransaction.vue";
 import EmployeeTransfering from "@/components/AdminDashboard/EmployeeTransfering.vue";
-import ATM from "@/components/ATM/ATMView.vue";
+import ATMView from "@/components/ATM/ATMView.vue";
 
 let employeeRoutes = [];
 
@@ -77,7 +77,7 @@ const routes = [
   {
     path: "/atm",
     name: "ATM",
-    component: ATM,
+    component: ATMView,
     meta: {
       requiresAuth: true,
       requiresRole: "CUSTOMER",
