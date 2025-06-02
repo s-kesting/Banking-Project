@@ -16,18 +16,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/transaction")
 @Tag(name = "Transactions", description = "Endpoints for money transfers")
 public class TransactionController {
-    
+
     private final TransactionService transactionService;
 
-    public TransactionController(TransactionService transactionService){
+    public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 
     @Operation(summary = "Create a new transaction (transfer money)", description = "sender, receiver, and records the transaction.")
     @PostMapping
-    public ResponseEntity<Transaction> postTransaction(@RequestBody Transaction transaction){
+    public ResponseEntity<Transaction> postTransaction(@RequestBody Transaction transaction) {
         Transaction createTransaction = transactionService.CreateTransaction(transaction);
-        return new ResponseEntity<>(createTransaction,HttpStatus.CREATED);
+        return new ResponseEntity<>(createTransaction, HttpStatus.CREATED);
     }
-    
+
 }

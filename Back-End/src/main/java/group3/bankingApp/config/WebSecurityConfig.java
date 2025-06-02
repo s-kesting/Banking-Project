@@ -43,7 +43,6 @@ public class WebSecurityConfig {
                         .requestMatchers("/v3/**").permitAll()
                         .requestMatchers("/api/user/auth/register").permitAll()
                         .requestMatchers("/api/user/auth/login").permitAll()
-
                         .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),

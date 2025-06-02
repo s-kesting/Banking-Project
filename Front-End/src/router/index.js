@@ -31,7 +31,7 @@ const routes = [
         component: DashBoard,
         meta: {
             requiresAuth: true,
-            requiresRole: "EMPLOYEE"
+            requiresRole: "CUSTOMER"
         }
     },
     {
@@ -64,32 +64,30 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore()
 
-
-    //authStore.initializeAuth()
-
     // Check if route requires authentication
     if (to.meta.requiresAuth) {
+
         if (!authStore.isLoggedIn) {
             next('/login')
             return
         }
-
-        if (to.meta.requiresRole) {
-            console.log(authStore.userRole);
-            let status = authStore.userRole;
-            if (authStore.userRole === "EMPLOYEE") {
-                if (meta.path !== '/employee_overview') {
-                    next('/employee_overview')
-                    return
+        else {
+            if (to.meta.requiresRole) {
+                let status = authStore.userRole;
+                if (authStore.userRole === "EMPLOYEE") {
+                    if (to.path !== '/employee_overview' && to.meta.requiresRole !== "EMPLOYEE") {
+                        next('/employee_overview')
+                        return
+                    }
                 }
-            }
-            if (authStore.userRole === "CUSTOMER") {
-                if (to.path !== '/dashboard') {
-                    next('/dashboard')
-                    return
+                if (authStore.userRole === "CUSTOMER") {
+                    if (to.path !== '/dashboard') {
+                        next('/dashboard')
+                        return
+                    }
                 }
-            }
 
+            }
         }
         // Check role-based access
         //        if (to.meta.requiresRole && authStore.userRole == "EMPLOYEE") {

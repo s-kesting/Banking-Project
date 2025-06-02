@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/config";
 
+//FIXME: remove authstore data when token expires
+
 export const useAuthStore = defineStore("auth", {
     state: () => ({
         token: localStorage.getItem("token") || null,
@@ -25,7 +27,7 @@ export const useAuthStore = defineStore("auth", {
                 // Save token and user info
                 this.token = res.data.token;
                 this.user = {
-                    id: res.data.id,
+                    userId: res.data.userId,
                     username: res.data.username,
                     role: res.data.role,
                 };
@@ -35,14 +37,12 @@ export const useAuthStore = defineStore("auth", {
                 localStorage.setItem("user", JSON.stringify(this.user));
 
                 // Set axios header for future requests
-                axios.defaults.headers.common["Authorization"] = `Bearer ${this.token}`;
             } catch (err) {
                 this.logout();
                 throw err;
             }
         },
 
-        //FIXME: fix this
         checkTokenValidity() {
             if (!this.token) { return false }
 
@@ -52,7 +52,6 @@ export const useAuthStore = defineStore("auth", {
                 const currentTime = Date.now() / 1000
 
                 if (payload.exp < currentTime) {
-                    console.log("logout called3")
                     this.logout()
                     return false
                 }
@@ -64,23 +63,11 @@ export const useAuthStore = defineStore("auth", {
                 return false
             }
         },
-        //FIXME:: fixthis
         async initializeAuth() {
             if (this.token && !this.checkTokenValidity()) {
                 this.logout()
-                console.log("logout called9")
             }
         },
-        async register({ username, email, password, phoneNumber, bsn }) {
-            await axios.post(API_ENDPOINTS.register, {
-                username,
-                email,
-                password,
-                phoneNumber,
-                bsn,
-            });
-        },
-
         async getUserData() {
             try {
                 // You could call your own endpoint if available, for now we just read the token
@@ -88,7 +75,6 @@ export const useAuthStore = defineStore("auth", {
                 this.user = userData;
                 return userData;
             } catch (err) {
-                console.log("logout called9")
                 this.logout();
                 throw err;
             }
@@ -100,7 +86,6 @@ export const useAuthStore = defineStore("auth", {
             this.user = null;
             localStorage.removeItem("token");
             localStorage.removeItem("user");
-            delete axios.defaults.headers.common["Authorization"];
             console.log("user logged out")
         },
     },
