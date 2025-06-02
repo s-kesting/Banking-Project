@@ -28,6 +28,7 @@ import { ref, shallowRef } from 'vue'
 import SavingsAccount from "./accounts/SavingsAccount.vue";
 import CheckingsAccount from "./accounts/CheckingsAccount.vue";
 import CreateAccount from "./accounts/CreateAccount.vue";
+import UserTransaction from "./transaction/UserTransaction.vue";
 
 let content = shallowRef(AccountList)
 let activeItem = ref("Overview")
@@ -35,6 +36,7 @@ const items = {
     "Overview": AccountList,
     "Checkings": CheckingsAccount,
     "Savings": SavingsAccount,
+    "Transfer": UserTransaction,
     "New account": CreateAccount
 };
 function setComponent(component) {
@@ -43,7 +45,6 @@ function setComponent(component) {
 function setActive(item) {
     activeItem = item
 }
-
 
 
 </script>

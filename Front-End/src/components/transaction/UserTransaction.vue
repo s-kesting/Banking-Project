@@ -8,8 +8,7 @@
           id="senderIban"
           v-model="form.senderIban"
           type="text"
-          placeholder="NL91ABNA0000001234"
-          required
+          readonly
         />
       </div>
 
@@ -57,20 +56,27 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import apiClient from "@/utils/apiClient";
 import { API_BASE_URL } from "@/config";
-import { useAuthStore } from "@/stores/authStore.js";
+
+// Import our global store
+import { initialSenderIban } from "@/stores/contentPropsStore";
 
 const form = ref({
-  senderIban: "",
-  receiverIban: "",
-  amount: null,
-  description: "",
+  senderIban:     "",
+  receiverIban:   "",
+  amount:         null,
+  description:    "",
 });
 const loading = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
+
+onMounted(() => {
+  // As soon as this component mounts, grab the IBAN from the store:
+  form.value.senderIban = initialSenderIban.value;
+});
 
 async function onSubmit() {
   errorMessage.value = "";
@@ -78,23 +84,20 @@ async function onSubmit() {
   loading.value = true;
 
   const payload = {
-    senderIban: form.value.senderIban.trim(),
+    senderIban:   form.value.senderIban,
     receiverIban: form.value.receiverIban.trim(),
-    amount: form.value.amount,
-    description: form.value.description.trim() || null,
+    amount:       form.value.amount,
+    description:  form.value.description.trim() || null,
   };
 
   try {
-    const authStore = useAuthStore();
-    const res = await apiClient.post(`${API_BASE_URL}transactions/user`, payload);
+    const res = await apiClient.post(`${API_BASE_URL}transactions/user`,payload);
     successMessage.value = `Transaction #${res.data.transactionId} succeeded.`;
-    form.value.senderIban = "";
     form.value.receiverIban = "";
     form.value.amount = null;
     form.value.description = "";
   } catch (err) {
-    if (err.response) {
-      errorMessage.value = err.response.data || "Failed to create transaction.";
+    if (err.response) {errorMessage.value = err.response.data || "Failed to create transaction.";
     } else {
       errorMessage.value = "Network error; please try again.";
     }

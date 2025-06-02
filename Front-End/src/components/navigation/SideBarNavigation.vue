@@ -16,11 +16,11 @@ const props = defineProps({
     activeItem: String,
     items: Object
 });
-const emit = defineEmits(["activeItem"], ["navigate"]);
+const emit = defineEmits(['active-item', 'navigate']);
 
 function handleClick(component, navItem) {
-    emit("activeItem", navItem)
-    emit("navigate", component);
+  emit('active-item', navItem);
+  emit('navigate', component);
 }
 
 </script>

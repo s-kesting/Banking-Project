@@ -1,5 +1,6 @@
 package group3.bankingApp.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -22,8 +23,6 @@ import group3.bankingApp.services.TransactionService;
 import group3.bankingApp.util.JwtTokenParser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -46,7 +45,7 @@ public class TransactionController {
 
         // extract the userId from the JWT
         int userId = jwtParser.getTokenUserId(authentication);
-
+        System.out.println(requestDto);
          // verify that the senderIban belongs to this user
         Account sender = accountRepository
             .findByIBAN(requestDto.getSenderIban())
