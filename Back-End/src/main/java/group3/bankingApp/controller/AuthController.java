@@ -126,4 +126,23 @@ public class AuthController {
 
     }
 
+        @GetMapping("/check-username")
+    public ResponseEntity<?> checkUsername(@RequestParam String username) {
+        boolean exists = userRepository.findByUsername(username).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestParam String email) {
+        boolean exists = userRepository.findByEmail(email).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @GetMapping("/check-bsn")
+    public ResponseEntity<?> checkBsn(@RequestParam String bsn) {
+        boolean exists = userRepository.findByBsn(bsn).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+
 }
