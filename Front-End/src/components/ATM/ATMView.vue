@@ -65,9 +65,10 @@ export default {
     },
     async fetchAccounts() {
       try {
-        const res = await axios.get("/api/user/accounts", {
+        const res = await axios.get("/api/account/user", {
           headers: this.getAuthHeader(),
         });
+
         this.accounts = res.data;
       } catch (err) {
         console.error("Failed to load accounts:", err);

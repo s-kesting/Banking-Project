@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import group3.bankingApp.model.enums.ATMTransactionStatus;
+import group3.bankingApp.model.enums.ATMTransactionType;
+
 import java.util.Map;
 
 @RestController
@@ -29,7 +32,7 @@ public class ATMController {
         Integer accountId = payload.get("accountId");
         int userId = jwtTokenParser.getTokenUserId(authentication);
 
-        // Optional: add check here to verify userId owns accountId
+        // Optional: add server-side ownership check here (future improvement)
 
         ATMSession session = atmService.startSession(accountId);
         return ResponseEntity.ok(Map.of(
@@ -41,26 +44,27 @@ public class ATMController {
     @PostMapping("/withdraw")
     public ResponseEntity<?> withdraw(Authentication authentication,
                                       @RequestBody Map<String, Integer> payload) {
-        return handleTransaction(authentication, payload, "withdraw");
+        return handleTransaction(authentication, payload, ATMTransactionType.WITHDRAWAL);
     }
 
     @PostMapping("/deposit")
     public ResponseEntity<?> deposit(Authentication authentication,
                                      @RequestBody Map<String, Integer> payload) {
-        return handleTransaction(authentication, payload, "deposit");
+        return handleTransaction(authentication, payload, ATMTransactionType.DEPOSIT);
     }
 
     private ResponseEntity<?> handleTransaction(Authentication authentication,
                                                 Map<String, Integer> payload,
-                                                String type) {
+                                                ATMTransactionType type) {
         Integer sessionId = payload.get("sessionId");
         Integer accountId = payload.get("accountId");
         Integer amount = payload.get("amount");
         int userId = jwtTokenParser.getTokenUserId(authentication);
 
-        ATMTransaction txn = type.equals("withdraw")
-                ? atmService.withdraw(sessionId, accountId, userId, amount)
-                : atmService.deposit(sessionId, accountId, userId, amount);
+        ATMTransaction txn = switch (type) {
+            case WITHDRAWAL -> atmService.withdraw(sessionId, accountId, userId, amount);
+            case DEPOSIT    -> atmService.deposit(sessionId, accountId, userId, amount);
+        };
 
         return ResponseEntity.ok(Map.of(
                 "status", txn.getStatus().name(),
