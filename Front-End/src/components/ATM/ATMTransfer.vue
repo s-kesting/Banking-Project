@@ -4,11 +4,6 @@
 
     <form @submit.prevent="handleTransfer">
       <div>
-        <label for="sessionId">Session ID:</label>
-        <input type="number" v-model="form.sessionId" required />
-      </div>
-
-      <div>
         <label for="targetAccountId">Target Account ID:</label>
         <input type="number" v-model="form.targetAccountId" required />
       </div>
@@ -46,6 +41,12 @@ export default {
       message: "",
     };
   },
+  mounted() {
+    this.form.sessionId = this.$route.query.sessionId || "";
+    this.form.amount = "";
+    this.form.description = "";
+  },
+
   methods: {
     handleTransfer() {
       this.message = "";
@@ -61,7 +62,10 @@ export default {
           this.message = `Transfer successful. Transaction ID: ${response.data.transactionId}`;
         })
         .catch((error) => {
-          this.message = `${error.response?.data || "Transfer failed."}`;
+          console.error("Full error:", error);
+          this.message = `Transfer failed. ${
+            error.response?.data || error.message
+          }`;
         });
     },
   },

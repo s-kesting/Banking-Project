@@ -4,10 +4,49 @@
       <h1>Products</h1>
     </div>
     <div class="right">
-      <button class="transfer-btn">Transfer</button>
+      <button class="transfer-btn" @click="initiateATM">Transfer</button>
     </div>
   </header>
 </template>
+
+<script>
+import axios from "axios";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import API_ENDPOINTS from "@/config";
+
+export default {
+  setup() {
+    const router = useRouter();
+    const authStore = useAuthStore();
+
+    const initiateATM = async () => {
+      try {
+        const accountId = 24; // TEST VALUE, HARDCODED
+        if (!accountId) {
+          alert("No account ID found.");
+          return;
+        }
+
+        const response = await axios.post(
+          `${API_ENDPOINTS.ATM}/start-session`,
+          { accountId }
+        );
+
+        const sessionId = response.data.sessionId;
+        router.push({ name: "ATMTransfer", query: { sessionId, accountId } });
+      } catch (error) {
+        console.error("ATM session error:", error);
+        alert("Could not start ATM session.");
+      }
+    };
+
+    return {
+      initiateATM,
+    };
+  },
+};
+</script>
 
 <style scoped>
 .top-nav {
