@@ -28,9 +28,12 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     void deposit(@Param("id") Integer id, @Param("amount") double amount);
 
     List<Account> findByUserId(int userId);
-    
+
     Optional<Account> findByIBAN(String IBAN);
 
     List<Account> findByUserIdAndAccountType(int userId, AccountType accountType);
+
+    // Check whether bank number is exist
+    boolean existsByIBAN(String IBAN);
 
 }
