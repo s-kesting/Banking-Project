@@ -19,6 +19,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // source: https://www.baeldung.com/the-persistence-layer-with-spring-and-jpa
     Optional<User> findByUsername(String username);
 
+      Optional<User> findByEmail(String email);      
+
+    Optional<User> findByBsn(String bsn);           
+
     List<User> findByUsernameContainingIgnoreCase(String username);
 
 

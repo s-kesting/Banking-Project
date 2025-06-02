@@ -50,6 +50,16 @@
 
         <button type="submit" class="btn-transfer">Transfer Funds</button>
 
+        <p
+          v-if="
+            senderIBAN.trim() === receiverIBAN.trim() &&
+            senderIBAN &&
+            receiverIBAN
+          "
+          class="error-message"
+        >
+          Sender and receiver IBANs must be different.
+        </p>
         <p v-if="error" class="error-message">❌ {{ error }}</p>
         <p v-if="success" class="success-message">✅ {{ success }}</p>
       </form>
@@ -60,6 +70,7 @@
 <script>
 import axios from "axios";
 import API_ENDPOINTS from "@/config";
+import apiClient from "@/utils/apiClient";
 
 export default {
   name: "EmployeeTransfer",
@@ -78,13 +89,20 @@ export default {
       this.error = "";
       this.success = "";
 
+      // Basic validation
       if (!this.senderIBAN || !this.receiverIBAN || !this.amount) {
         this.error = "All fields must be filled correctly.";
         return;
       }
 
+      // Guard: Prevent sending to the same IBAN
+      if (this.senderIBAN.trim() === this.receiverIBAN.trim()) {
+        this.error = "Sender and receiver IBANs must be different.";
+        return;
+      }
+
       try {
-        const response = await axios.post(
+        const response = await apiClient.post(
           `${API_ENDPOINTS.transactions}/employee-transfer`,
           {
             senderIBAN: this.senderIBAN,
