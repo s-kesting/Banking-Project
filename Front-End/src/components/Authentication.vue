@@ -98,6 +98,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import API_ENDPOINTS from "@/config.js";
 import axios from "axios";
+import apiClient from "@/utils/apiClient";
 
 export default {
   name: "Auth",
@@ -156,13 +157,42 @@ export default {
       }
 
       try {
-        await axios.post(API_ENDPOINTS.register, {
+        //Username check
+        const usernameCheck = await apiClient.get(API_ENDPOINTS.checkUsername, {
+          params: { username: name.value },
+        });
+        if (usernameCheck.data.exists) {
+          error.value = "Username is already taken.";
+          return;
+        }
+
+        // Email check
+        const emailCheck = await apiClient.get(API_ENDPOINTS.checkEmail, {
+          params: { email: email.value },
+        });
+        if (emailCheck.data.exists) {
+          error.value = "Email is already registered.";
+          return;
+        }
+
+        // BSN check
+        const bsnCheck = await apiClient.get(API_ENDPOINTS.checkBsn, {
+          params: { bsn: bsn.value },
+        });
+        if (bsnCheck.data.exists) {
+          error.value = "BSN is already registered.";
+          return;
+        }
+
+        // All checks passed — continue to register
+        await apiClient.post(API_ENDPOINTS.register, {
           username: name.value,
           email: email.value,
           password: password.value,
           phoneNumber: phoneNumber.value,
           bsn: bsn.value,
         });
+
         isLogin.value = true;
       } catch (err) {
         error.value = err.response?.data?.error || err.message;
