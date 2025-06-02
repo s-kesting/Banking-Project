@@ -21,6 +21,10 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+    public List<Account> findByUserIdAndAccountType(int userId, AccountType accountType) {
+        return accountRepository.findByUserIdAndAccountType(userId, accountType);
+    }
+
     public Account save(Account account) {
         return accountRepository.save(account);
     }
@@ -30,9 +34,7 @@ public class AccountService {
     }
 
     public List<Account> findUsersAccounts(int userId) {
-        // <<<<<<< HEAD
         // return accountRepository.findByUserId(userId);
-        // =======
         List<Account> accounts = accountRepository.findByUserId(userId);
         if (accounts.isEmpty()) {
             throw new NoSuchElementException("No accounts found for user ID: " + userId);
@@ -42,6 +44,10 @@ public class AccountService {
 
     public Page<Account> findAll(Pageable pageable) {
         return accountRepository.findAll(pageable);
+    }
+
+    public void newAccountRequest(int userId, AccountType accountType) {
+        createAccount(userId, accountType);
     }
 
     public void createDefaultAccountsForUser(Integer userId) {
@@ -61,11 +67,19 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    // Example IBAN generator
-    private String generateIban() {
-        String prefix = "NL91ABNA";
-        String numbers = String.format("%010d", new Random().nextInt(1_000_000_000));
-        return prefix + numbers;
+    // IBAN generator
+    public String generateIban() {
+        String bankCode = "INHO0";
+        Random random = new Random();
+        String iban;
+
+        do {
+            String checkDigits = String.format("%02d", random.nextInt(100)); // Random 2 digits
+            String accountNumber = String.format("%09d", random.nextInt(1_000_000_000)); // 9 digits
+            iban = "NL" + checkDigits + bankCode + accountNumber;
+        } while (accountRepository.existsByIBAN(iban)); // ensure uniqueness
+
+        return iban;
     }
 
 }

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import group3.bankingApp.model.Account;
+import group3.bankingApp.model.enums.AccountType;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
@@ -28,7 +29,11 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     List<Account> findByUserId(int userId);
 
-    //search for IBAN
     Optional<Account> findByIBAN(String IBAN);
-    
+
+    List<Account> findByUserIdAndAccountType(int userId, AccountType accountType);
+
+    // Check whether bank number is exist
+    boolean existsByIBAN(String IBAN);
+
 }

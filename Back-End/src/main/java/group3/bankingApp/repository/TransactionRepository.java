@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import group3.bankingApp.model.Account;
 import group3.bankingApp.model.Transaction;
+import java.util.Optional;
 
 /**
  * TransactionRepository

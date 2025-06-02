@@ -8,6 +8,7 @@ import Authentication from "@/components/Authentication.vue";
 import EmployeeOverview from "@/components/AdminDashboard/EmployeeOverview.vue";
 import EmployeeTransaction from "@/components/AdminDashboard/EmployeeTransaction.vue";
 import UserTransaction from "@/components/transaction/UserTransaction.vue";
+import EmployeeTransfering from "@/components/AdminDashboard/EmployeeTransfering.vue";
 
 let employeeRoutes = [];
 
@@ -70,7 +71,14 @@ const routes = [
     component: UserTransaction,
     meta: { 
       requiresAuth: true, 
-      requiresRole: "CUSTOMER" 
+      requiresRole: "CUSTOMER"
+    },
+    path: "/employee_transfering",
+    name: "EmployeeTransfering",
+    component: EmployeeTransfering,
+    meta: {
+      requiresAuth: true,
+      requiresRole: "EMPLOYEE",
     },
   },
 ];
