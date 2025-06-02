@@ -5,6 +5,9 @@
     </div>
     <div class="right">
       <button class="transfer-btn">Transfer</button>
+      <router-link to="/atm">
+        <button class="transfer-btn">Deposit/Withdraw</button>
+      </router-link>
     </div>
   </header>
 </template>

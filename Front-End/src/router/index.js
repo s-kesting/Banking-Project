@@ -73,6 +73,11 @@ const routes = [
       requiresRole: "EMPLOYEE",
     },
   },
+  {
+    path: "/atm",
+    name: "ATM",
+    component: () => import("@/views/ATMView.vue"),
+  },
 ];
 
 const router = createRouter({
