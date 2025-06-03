@@ -31,7 +31,6 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // FIXEME: make sure to change the security filter
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -47,14 +46,19 @@ public class WebSecurityConfig {
                         .requestMatchers("/v3/**").permitAll()
                         .requestMatchers("/api/user/auth/register").permitAll()
                         .requestMatchers("/api/user/auth/login").permitAll()
-                        .requestMatchers("/api/transactions/employee-transfer").hasAuthority("EMPLOYEE")
-                        .requestMatchers("/api/transactions/user/**").hasAuthority("CUSTOMER")
+                        .requestMatchers("/api/user/auth/check-username").permitAll()
+                        .requestMatchers("/api/user/auth/check-email").permitAll()
+                        .requestMatchers("/api/user/auth/check-bsn").permitAll()
                         .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/api/transactions/user/**").hasAuthority("CUSTOMER")
+                        .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/api/transactions/employee-transfer").hasAuthority("EMPLOYEE")
+                        
+                        .requestMatchers("/atm/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }

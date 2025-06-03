@@ -13,17 +13,15 @@ import jakarta.persistence.Table;
 @Table(name = "ATMSESSION")
 public class ATMSession {
     @Id
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer sessionId;
+    @Column(name = "SESSIONID")
+    private Integer sessionId; // PK
 
-    @Column(nullable = false)
+    @Column(name = "ACCOUNTID", nullable = false)
     private Integer accountId; // FK to account.accountId
 
     @Column(name = "LOGIN_TIME", nullable = false)
     private LocalDateTime loginTime;
-
-    // -- Getters & Setters --
 
     public Integer getSessionId() {
         return sessionId;

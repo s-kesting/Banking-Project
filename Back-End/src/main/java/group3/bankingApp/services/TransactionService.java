@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import group3.bankingApp.DTO.EmployeeTransferRequest;
@@ -20,6 +22,7 @@ import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.repository.TransactionRepository;
 import group3.bankingApp.repository.UserRepository;
 import jakarta.transaction.Transactional;
+
 
 @Service
 public class TransactionService {
@@ -210,5 +213,40 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
+       public Page<TransactionDTO> getPaginatedTransactionDTOs(Pageable pageable, String query) {
+    Page<Transaction> transactionPage;
+
+    if (query != null && !query.trim().isEmpty()) {
+        transactionPage = transactionRepository.findBySenderOrReceiverUsername(query.toLowerCase(), pageable);
+    } else {
+        transactionPage = transactionRepository.findAll(pageable);
+    }
+
+    return transactionPage.map(this::convertToDTO);
+}
+
+
+
+    private TransactionDTO convertToDTO(Transaction tx) {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setTransactionId(tx.getTransactionId());
+        dto.setAmount(tx.getAmount());
+        dto.setDescription(tx.getDescription());
+        dto.setCreatedAt(tx.getCreatedAt());
+
+        accountRepository.findById(tx.getSenderAccount()).ifPresent(senderAcc ->
+            userRepository.findById(senderAcc.getUserId()).ifPresent(senderUser ->
+                dto.setSenderUsername(senderUser.getUsername())
+            )
+        );
+
+        accountRepository.findById(tx.getReceiverAccount()).ifPresent(receiverAcc ->
+            userRepository.findById(receiverAcc.getUserId()).ifPresent(receiverUser ->
+                dto.setReceiverUsername(receiverUser.getUsername())
+            )
+        );
+
+        return dto;
+    }
 
 }

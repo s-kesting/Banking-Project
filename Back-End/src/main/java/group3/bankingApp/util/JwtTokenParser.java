@@ -8,6 +8,9 @@ import org.springframework.security.core.GrantedAuthority;
 import group3.bankingApp.model.enums.Role;
 import group3.bankingApp.security.CustomUserDetails;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class JwtTokenParser {
 
     public int getTokenUserId(Authentication authentication) {
