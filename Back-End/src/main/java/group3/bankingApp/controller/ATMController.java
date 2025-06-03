@@ -30,21 +30,15 @@ public class ATMController {
 
     private Integer getUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // In your JWT setup, auth.getName() holds the userId as a string
+        
         return Integer.parseInt(auth.getName());
     }
 
-    /**
-     * GET /api/atm/accounts
-     * Returns only the accounts owned by the currently authenticated user.
-     * Each account is transformed into a Map<String,Object> so JSON serializes properly.
-     */
     @GetMapping("/accounts")
     public ResponseEntity<List<Map<String, Object>>> getAccountsForCurrentUser() {
         Integer userId = getUserId();
         List<Account> accounts = accountRepository.findByUserId(userId);
 
-        // Build a List<Map<String,Object>> manually to guarantee correct JSON serialization
         List<Map<String, Object>> serialized = accounts.stream()
             .map(acc -> {
                 Map<String, Object> m = new HashMap<>();
@@ -58,10 +52,6 @@ public class ATMController {
         return ResponseEntity.ok(serialized);
     }
 
-    /**
-     * POST /api/atm/session
-     * Creates an ATM session for a given account (only if it belongs to this user).
-     */
     @PostMapping("/session")
     public ResponseEntity<?> startSession(@RequestBody Map<String, Object> requestBody) {
         Integer userId    = getUserId();
@@ -77,10 +67,6 @@ public class ATMController {
         return ResponseEntity.ok(session);
     }
 
-    /**
-     * POST /api/atm/deposit
-     * Deposits the specified amount into the specified account/session.
-     */
     @PostMapping("/deposit")
     public ResponseEntity<?> deposit(@RequestBody Map<String, Object> body) {
         Integer userId    = getUserId();
@@ -91,11 +77,6 @@ public class ATMController {
         ATMTransaction txn = atmService.deposit(sessionId, accountId, userId, amount);
         return ResponseEntity.ok(txn);
     }
-
-    /**
-     * POST /api/atm/withdraw
-     * Withdraws the specified amount from the specified account/session.
-     */
     @PostMapping("/withdraw")
     public ResponseEntity<?> withdraw(@RequestBody Map<String, Object> body) {
         Integer userId    = getUserId();

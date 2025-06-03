@@ -1,15 +1,24 @@
-import { fileURLToPath, URL } from "node:url";
-
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import vueDevTools from "vite-plugin-vue-devtools";
+// Add this import for path resolution:
+import path from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), vueDevTools()],
+  plugins: [vue()],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      // Tell Vite that “@” → the “src” folder
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
+  server: {
+    port: 5173, // keep this as you have it
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: (pathStr) => pathStr.replace(/^\/api/, "/api"),
+      },
     },
   },
 });

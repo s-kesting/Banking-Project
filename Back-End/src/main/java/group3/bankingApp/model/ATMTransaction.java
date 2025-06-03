@@ -35,7 +35,7 @@ public class ATMTransaction {
     @Column(name = "timestamp", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime timestamp;
 
-    // -- Getters & Setters --
+    // Getters & Setters
 
     public Integer getId() {
         return id;

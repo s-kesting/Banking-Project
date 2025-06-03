@@ -5,7 +5,5 @@ CREATE TABLE ATMTransaction (
     type ENUM('DEPOSIT', 'WITHDRAWAL') NOT NULL,
     amount INT NOT NULL,
     status ENUM('SUCCESS', 'FAILED') DEFAULT 'SUCCESS',
-    reason TEXT,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sessionID) REFERENCES ATMSession(sessionID)
 );

@@ -48,7 +48,13 @@ public class ATMService {
         return performTransaction(sessionId, accountId, userId, amount, ATMTransactionType.DEPOSIT);
     }
 
-    private ATMTransaction performTransaction(Integer sessionId, Integer accountId, Integer userId, int amount, ATMTransactionType type) {
+    private ATMTransaction performTransaction(
+            Integer sessionId,
+            Integer accountId,
+            Integer userId,
+            int amount,
+            ATMTransactionType type
+    ) {
         ATMTransaction txn = new ATMTransaction();
 
         // Validate session
@@ -60,27 +66,25 @@ public class ATMService {
         }
         txn.setSession(sessionOpt.get());
 
-        // Validate user and account
+        // Validate account & user existence
         Optional<Account> accountOpt = accountRepository.findById(accountId);
         Optional<User> userOpt = userRepository.findById(userId);
-
         if (accountOpt.isEmpty() || userOpt.isEmpty()) {
             txn.setStatus(ATMTransactionStatus.FAILED);
             txn.setReason("Account or user not found.");
             return atmTransactionRepository.save(txn);
         }
-
         Account account = accountOpt.get();
 
-        // Validate amount
+        // Validate amount > 0
         if (amount <= 0) {
             txn.setStatus(ATMTransactionStatus.FAILED);
             txn.setReason("Amount must be greater than zero.");
             return atmTransactionRepository.save(txn);
         }
 
+        // Check sufficient funds if withdrawing
         double currentBalance = account.getBalance();
-
         if (type == ATMTransactionType.WITHDRAWAL && currentBalance < amount) {
             txn.setStatus(ATMTransactionStatus.FAILED);
             txn.setReason("Insufficient funds.");
@@ -91,18 +95,14 @@ public class ATMService {
         double newBalance = (type == ATMTransactionType.WITHDRAWAL)
                 ? currentBalance - amount
                 : currentBalance + amount;
-
         account.setBalance(newBalance);
         accountRepository.save(account);
 
-        // Finalize successful transaction
+        // Record a successful transaction
         txn.setAmount(amount);
         txn.setType(type);
         txn.setStatus(ATMTransactionStatus.SUCCESS);
         txn = atmTransactionRepository.save(txn);
-
-        // End session after success
-        atmSessionRepository.deleteById(sessionId);
 
         return txn;
     }
