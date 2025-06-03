@@ -5,6 +5,16 @@ import group3.bankingApp.DTO.TransactionDTO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+import java.util.Map;
+import java.util.HashMap;
+
+
+
 
 import org.springframework.stereotype.Service;
 
@@ -16,6 +26,7 @@ import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import group3.bankingApp.repository.UserRepository;
+
 
 @Service
 public class TransactionService {
@@ -116,5 +127,40 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
+       public Page<TransactionDTO> getPaginatedTransactionDTOs(Pageable pageable, String query) {
+    Page<Transaction> transactionPage;
+
+    if (query != null && !query.trim().isEmpty()) {
+        transactionPage = transactionRepository.findBySenderOrReceiverUsername(query.toLowerCase(), pageable);
+    } else {
+        transactionPage = transactionRepository.findAll(pageable);
+    }
+
+    return transactionPage.map(this::convertToDTO);
+}
+
+
+
+    private TransactionDTO convertToDTO(Transaction tx) {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setTransactionId(tx.getTransactionId());
+        dto.setAmount(tx.getAmount());
+        dto.setDescription(tx.getDescription());
+        dto.setCreatedAt(tx.getCreatedAt());
+
+        accountRepository.findById(tx.getSenderAccount()).ifPresent(senderAcc ->
+            userRepository.findById(senderAcc.getUserId()).ifPresent(senderUser ->
+                dto.setSenderUsername(senderUser.getUsername())
+            )
+        );
+
+        accountRepository.findById(tx.getReceiverAccount()).ifPresent(receiverAcc ->
+            userRepository.findById(receiverAcc.getUserId()).ifPresent(receiverUser ->
+                dto.setReceiverUsername(receiverUser.getUsername())
+            )
+        );
+
+        return dto;
+    }
 
 }

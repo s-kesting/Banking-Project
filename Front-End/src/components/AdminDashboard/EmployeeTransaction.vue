@@ -20,7 +20,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="tx in paginatedTransactions" :key="tx.transactionId">
+        <tr v-for="tx in transactions" :key="tx.transactionId">
           <td>{{ tx.transactionId }}</td>
           <td>{{ tx.senderUsername }}</td>
           <td>{{ tx.receiverUsername }}</td>
@@ -45,62 +45,56 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import apiClient from "@/utils/apiClient";
 import { API_ENDPOINTS } from "@/config";
+import { watch } from "vue";
 
 // State
 const transactions = ref([]);
 const searchQuery = ref("");
 const errorMessage = ref("");
 
-// Pagination
 const currentPage = ref(1);
-const itemsPerPage = 10;
+const itemsPerPage = 15;
+const totalPages = ref(1);
 
-// Fetch Transactions from backend
+// Fetch paginated transactions from backend
 const fetchTransactions = async () => {
   try {
-    const res = await apiClient.get(
-      `${API_ENDPOINTS.transactions}/allTransactions`
-    );
-    transactions.value = res.data;
+    const res = await apiClient.get(`${API_ENDPOINTS.transactions}/paginated`, {
+      params: {
+        page: currentPage.value - 1,
+        size: itemsPerPage,
+        query: searchQuery.value || undefined,
+      },
+    });
+    transactions.value = res.data.transactions;
+    totalPages.value = res.data.totalPages;
   } catch (err) {
     errorMessage.value =
       "❌ Failed to load transactions: " + (err.response?.data || err.message);
   }
 };
 
-// Filter by sender or receiver username
-const filteredTransactions = computed(() => {
-  if (!searchQuery.value.trim()) return transactions.value;
-  return transactions.value.filter(
-    (tx) =>
-      tx.senderUsername
-        .toLowerCase()
-        .includes(searchQuery.value.toLowerCase()) ||
-      tx.receiverUsername
-        .toLowerCase()
-        .includes(searchQuery.value.toLowerCase())
-  );
+watch(searchQuery, () => {
+  currentPage.value = 1;
+  fetchTransactions();
 });
 
-// Pagination logic
-const totalPages = computed(() =>
-  Math.ceil(filteredTransactions.value.length / itemsPerPage)
-);
-
-const paginatedTransactions = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return filteredTransactions.value.slice(start, start + itemsPerPage);
-});
-
+// Pagination handlers
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++;
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchTransactions();
+  }
 };
 
 const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--;
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchTransactions();
+  }
 };
 
 // Format date
