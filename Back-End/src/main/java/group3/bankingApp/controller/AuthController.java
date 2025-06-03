@@ -42,6 +42,18 @@ public class AuthController {
                         .body("Username already taken");
             }
 
+            //Check if email already exists
+            if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("success", false, "error", "Email is already registered"));
+            }
+
+            //check if BSN already exist
+            if (userRepository.findByBsn(user.getBsn()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("success", false, "error", "BSN is already registered"));
+            }
+
             // Set user defaults
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRole(Role.CUSTOMER);
@@ -52,7 +64,9 @@ public class AuthController {
             userRepository.flush(); // Ensures data is written to DB immediately
 
             // Create default accounts (Checking + Saving)
-            accountService.createDefaultAccountsForUser(savedUser.getUserId());
+            if (savedUser.getVerifyUser() == VerifyStatus.ACTIVE) {
+                accountService.createDefaultAccountsForUser(savedUser.getUserId());
+            }
 
             // Return success response
             return ResponseEntity.ok(Map.of(
@@ -111,5 +125,24 @@ public class AuthController {
                 "userId", user.getUserId()));
 
     }
+
+        @GetMapping("/check-username")
+    public ResponseEntity<?> checkUsername(@RequestParam String username) {
+        boolean exists = userRepository.findByUsername(username).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestParam String email) {
+        boolean exists = userRepository.findByEmail(email).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @GetMapping("/check-bsn")
+    public ResponseEntity<?> checkBsn(@RequestParam String bsn) {
+        boolean exists = userRepository.findByBsn(bsn).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
 
 }

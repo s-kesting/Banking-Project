@@ -30,24 +30,27 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
-                .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/v3/**").permitAll()
-                .requestMatchers("/api/user/auth/register").permitAll()
-                .requestMatchers("/api/user/auth/login").permitAll()
-                .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
-                .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
-                .requestMatchers("/atm/**").permitAll()
-                .anyRequest().authenticated())
-            .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
-                UsernamePasswordAuthenticationFilter.class);
+                .cors(Customizer.withDefaults()) //
+                .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/**").permitAll()
+                        .requestMatchers("/api/user/auth/register").permitAll()
+                        .requestMatchers("/api/user/auth/login").permitAll()
+                        .requestMatchers("/api/user/auth/check-username").permitAll()
+                        .requestMatchers("/api/user/auth/check-email").permitAll()
+                        .requestMatchers("/api/user/auth/check-bsn").permitAll()
+                        .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/atm/**").permitAll(
+                        .anyRequest().authenticated())
+                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
