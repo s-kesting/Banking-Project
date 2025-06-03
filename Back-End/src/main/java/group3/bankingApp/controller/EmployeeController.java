@@ -7,9 +7,15 @@ import group3.bankingApp.repository.UserRepository;
 import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.services.AccountService;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Map;
+import java.util.HashMap;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +53,32 @@ public class EmployeeController {
 
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/users/paginated")
+    public ResponseEntity<Map<String, Object>> getUsersPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String username) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> usersPage = (username == null || username.isEmpty()) ?
+                userRepository.findAll(pageable) :
+                userRepository.findByUsernameContainingIgnoreCase(username, pageable);
+
+        List<Map<String, Object>> userList = usersPage.stream().map(user -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("user", user);
+            map.put("accounts", accountRepository.findByUserId(user.getUserId()));
+            return map;
+        }).collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("users", userList); //required for frontend
+        response.put("totalPages", usersPage.getTotalPages());
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @PutMapping("/users/{userId}/verify")
     public ResponseEntity<?> updateUserVerification(

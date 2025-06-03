@@ -2,106 +2,96 @@
   <div class="admin-dashboard">
     <h1>🌐 Admin Dashboard</h1>
 
-    <!-- 🔍 Search and Filter Section -->
+    <!-- Filters -->
     <div class="filters">
       <input
         v-model="searchQuery"
         @input="fetchUsers"
-        type="text"
-        placeholder="🔍 Search by username..."
-        class="search-bar"
+        placeholder="🔍 Search username"
       />
-
-      <label>
-        User Status:
-        <select v-model="userStatusFilter">
-          <option value="ALL">ALL</option>
-          <option value="PENDING">PENDING</option>
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="REJECTED">REJECTED</option>
-        </select>
-      </label>
-
-      <label>
-        Account Status:
-        <select v-model="accountStatusFilter">
-          <option value="ALL">ALL</option>
-          <option value="PENDING">PENDING</option>
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="REJECTED">REJECTED</option>
-        </select>
-      </label>
+      <select v-model="userStatusFilter">
+        <option value="ALL">User Status: All</option>
+        <option value="PENDING">Pending</option>
+        <option value="ACTIVE">Active</option>
+        <option value="REJECTED">Rejected</option>
+      </select>
+      <select v-model="accountStatusFilter">
+        <option value="ALL">Account Status: All</option>
+        <option value="PENDING">Pending</option>
+        <option value="ACTIVE">Active</option>
+        <option value="REJECTED">Rejected</option>
+      </select>
     </div>
 
-    <!-- 📊 Users Table -->
-    <div class="table-wrapper">
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th>👤 Username</th>
-            <th>📧 Email</th>
-            <th>🔐 User Status</th>
-            <th>🏦 IBAN</th>
-            <th>💳 Type</th>
-            <th>🛡️ Account Status</th>
-            <th>⚠️ Absolute (€)</th>
-            <th>💰 Daily (€)</th>
-            <th>🛠️ Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <template
-            v-for="userWithAccount in paginatedUsers"
-            :key="userWithAccount.user.userId"
-          >
-            <!-- 👤 User Row -->
-            <tr
-              :class="{ 'no-accounts': userWithAccount.accounts.length === 0 }"
+    <!-- User List -->
+    <div
+      v-for="userWithAccount in paginatedUsers"
+      :key="userWithAccount.user.userId"
+      class="user-block"
+    >
+      <div class="user-header">
+        <div class="user-info">
+          <strong>👤 {{ userWithAccount.user.username }}</strong>
+          <span>— {{ userWithAccount.user.email }}</span>
+          <div class="status-controls">
+            <label>🔐 Status:</label>
+            <select
+              v-model="userWithAccount.user.verifyUser"
+              :class="`status-tag ${userWithAccount.user.verifyUser.toLowerCase()}`"
+              @change="syncAccountStatus(userWithAccount)"
             >
-              <td>{{ userWithAccount.user.username }}</td>
-              <td>{{ userWithAccount.user.email }}</td>
-              <td>
-                <select
-                  v-model="userWithAccount.user.verifyUser"
-                  :class="
-                    'status-' + userWithAccount.user.verifyUser.toLowerCase()
-                  "
-                >
-                  <option value="PENDING">PENDING</option>
-                  <option value="ACTIVE">ACTIVE</option>
-                  <option value="REJECTED">REJECTED</option>
-                </select>
-              </td>
+              <option value="PENDING">PENDING</option>
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="REJECTED">REJECTED</option>
+            </select>
+            <button
+              class="save-btn"
+              @click="updateUserStatus(userWithAccount.user)"
+            >
+              💾 Save User
+            </button>
+          </div>
+        </div>
+        <div
+          class="arrow-toggle"
+          @click="toggleExpanded(userWithAccount.user.userId)"
+        >
+          <span v-if="expandedUser === userWithAccount.user.userId">🔽</span>
+          <span v-else>▶</span>
+        </div>
+      </div>
 
-              <!-- 🔘 Save Button in User Row if no accounts yet -->
-              <template v-if="userWithAccount.accounts.length === 0">
-                <td colspan="5"></td>
-                <td>
-                  <button @click="updateUserStatus(userWithAccount.user)">
-                    💾 Save
-                  </button>
-                </td>
-              </template>
-
-              <!-- ➖ Empty TDs when accounts exist -->
-              <template v-else>
-                <td colspan="6"></td>
-              </template>
+      <!-- Accounts Table -->
+      <div
+        v-if="
+          expandedUser === userWithAccount.user.userId &&
+          userWithAccount.accounts.length
+        "
+        class="account-section"
+      >
+        <h4>🏦 Accounts</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>IBAN</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Abs (€)</th>
+              <th>Daily (€)</th>
             </tr>
-
-            <!-- 🏦 Account Rows -->
+          </thead>
+          <tbody>
             <tr
               v-for="account in userWithAccount.accounts"
               :key="account.accountId"
-              class="account-row"
             >
-              <td colspan="3"></td>
               <td>{{ account.iban }}</td>
               <td>{{ account.accountType }}</td>
               <td>
                 <select
                   v-model="account.verifyAccount"
-                  :class="'status-' + account.verifyAccount.toLowerCase()"
+                  :class="`status-tag ${account.verifyAccount.toLowerCase()}`"
+                  :disabled="userWithAccount.user.verifyUser === 'REJECTED'"
                 >
                   <option value="PENDING">PENDING</option>
                   <option value="ACTIVE">ACTIVE</option>
@@ -109,29 +99,39 @@
                 </select>
               </td>
               <td>
-                <input type="number" v-model.number="account.absoluteLimit" />
+                <input
+                  type="number"
+                  v-model.number="account.absoluteLimit"
+                  :disabled="userWithAccount.user.verifyUser === 'REJECTED'"
+                />
               </td>
               <td>
-                <input type="number" v-model.number="account.dailyLimit" />
-              </td>
-              <td>
-                <button
-                  @click="updateUserAndAccount(userWithAccount.user, account)"
-                >
-                  💾 Save
-                </button>
+                <input
+                  type="number"
+                  v-model.number="account.dailyLimit"
+                  :disabled="userWithAccount.user.verifyUser === 'REJECTED'"
+                />
               </td>
             </tr>
-          </template>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+
+        <!-- Unified Save Button for All Accounts -->
+        <div class="save-accounts-wrapper">
+          <button
+            class="save-btn"
+            @click="updateAllAccounts(userWithAccount)"
+            :disabled="userWithAccount.user.verifyUser === 'REJECTED'"
+          >
+            💾 Save Accounts
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- 🔁 Pagination -->
+    <!-- Pagination -->
     <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">
-        ⬅️ Previous
-      </button>
+      <button @click="prevPage" :disabled="currentPage === 1">⬅️ Prev</button>
       <span>Page {{ currentPage }} / {{ totalPages }}</span>
       <button @click="nextPage" :disabled="currentPage === totalPages">
         Next ➡️
@@ -143,132 +143,110 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
 import apiClient from "@/utils/apiClient";
 import { API_ENDPOINTS } from "@/config";
 
 const users = ref([]);
+const currentPage = ref(1);
+const totalPages = ref(1);
+const usersPerPage = 5;
 const searchQuery = ref("");
-const errorMessage = ref("");
-
 const userStatusFilter = ref("ALL");
 const accountStatusFilter = ref("ALL");
+const expandedUser = ref(null);
+const errorMessage = ref("");
 
-const currentPage = ref(1);
-const usersPerPage = 10;
-
-// ✅ Fetch users
 const fetchUsers = async () => {
   try {
-    errorMessage.value = "";
-    const queryParam = searchQuery.value
-      ? `?username=${searchQuery.value}`
-      : "";
+    const query = new URLSearchParams();
+    query.append("page", currentPage.value - 1);
+    query.append("size", usersPerPage);
+    if (searchQuery.value.trim())
+      query.append("username", searchQuery.value.trim());
+
     const res = await apiClient.get(
-      `${API_ENDPOINTS.employee}/users${queryParam}`
+      `${API_ENDPOINTS.employee}/users/paginated?${query.toString()}`
     );
-    users.value = res.data;
-    currentPage.value = 1;
-    setupUserStatusWatchers();
+    users.value = res.data.users;
+    totalPages.value = res.data.totalPages;
   } catch (err) {
     errorMessage.value =
       "❌ Failed to load users: " + (err.response?.data || err.message);
   }
 };
 
-// ✅ Update both user and one account
-const updateUserAndAccount = async (user, account) => {
-  try {
-    errorMessage.value = "";
-
-    await apiClient.put(
-      `${API_ENDPOINTS.employee}/users/${user.userId}/verify`,
-      {
-        verifyUser: user.verifyUser,
-      }
-    );
-
-    await apiClient.put(
-      `${API_ENDPOINTS.employee}/accounts/${account.accountId}`,
-      {
-        verifyAccount: account.verifyAccount,
-        dailyLimit: account.dailyLimit,
-        absoluteLimit: account.absoluteLimit,
-      }
-    );
-
-    alert("✅ Update successful!");
-  } catch (err) {
-    errorMessage.value =
-      "❌ Update failed: " + (err.response?.data || err.message);
-  }
-};
-
-// ✅ Only update user when accounts don't exist yet
 const updateUserStatus = async (user) => {
   try {
-    errorMessage.value = "";
-
     await apiClient.put(
       `${API_ENDPOINTS.employee}/users/${user.userId}/verify`,
       {
         verifyUser: user.verifyUser,
       }
     );
-
-    await fetchUsers(); // refresh list to get generated accounts
-    alert("✅ User status updated and accounts created!");
+    await fetchUsers(); // Refresh if accounts are generated
   } catch (err) {
-    errorMessage.value =
-      "❌ Update failed: " + (err.response?.data || err.message);
+    errorMessage.value = "❌ User status update failed.";
   }
 };
 
-// ✅ Filtering logic
-const filteredUsers = computed(() => {
-  return users.value.filter((userWithAccount) => {
-    const userStatusMatches =
-      userStatusFilter.value === "ALL" ||
-      userWithAccount.user.verifyUser === userStatusFilter.value;
+const updateAllAccounts = async (userWithAccount) => {
+  try {
+    for (const account of userWithAccount.accounts) {
+      await apiClient.put(
+        `${API_ENDPOINTS.employee}/accounts/${account.accountId}`,
+        {
+          verifyAccount: account.verifyAccount,
+          absoluteLimit: account.absoluteLimit,
+          dailyLimit: account.dailyLimit,
+        }
+      );
+    }
+    alert("✅ All accounts updated!");
+  } catch (err) {
+    errorMessage.value =
+      "❌ Account update failed: " + (err.response?.data || err.message);
+  }
+};
 
-    const accountStatusMatches =
+const syncAccountStatus = (userWithAccount) => {
+  const status = userWithAccount.user.verifyUser;
+  if (status === "REJECTED" || status === "PENDING") {
+    userWithAccount.accounts.forEach((acc) => (acc.verifyAccount = status));
+  }
+};
+
+const toggleExpanded = (userId) => {
+  expandedUser.value = expandedUser.value === userId ? null : userId;
+};
+
+const filteredUsers = computed(() => {
+  return users.value.filter((entry) => {
+    const userMatch =
+      userStatusFilter.value === "ALL" ||
+      entry.user.verifyUser === userStatusFilter.value;
+    const accountMatch =
       accountStatusFilter.value === "ALL" ||
-      userWithAccount.accounts.some(
+      entry.accounts.some(
         (acc) => acc.verifyAccount === accountStatusFilter.value
       );
-
-    return userStatusMatches && accountStatusMatches;
+    return userMatch && accountMatch;
   });
 });
 
-const paginatedUsers = computed(() => {
-  const start = (currentPage.value - 1) * usersPerPage;
-  return filteredUsers.value.slice(start, start + usersPerPage);
-});
-
-const totalPages = computed(() =>
-  Math.ceil(filteredUsers.value.length / usersPerPage)
-);
+const paginatedUsers = computed(() => filteredUsers.value);
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++;
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchUsers();
+  }
 };
-
 const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--;
-};
-
-const setupUserStatusWatchers = () => {
-  users.value.forEach((userWithAccount) => {
-    watch(
-      () => userWithAccount.user.verifyUser,
-      (newStatus) => {
-        userWithAccount.accounts.forEach((acc) => {
-          acc.verifyAccount = newStatus;
-        });
-      }
-    );
-  });
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchUsers();
+  }
 };
 
 onMounted(fetchUsers);
@@ -276,135 +254,104 @@ onMounted(fetchUsers);
 
 <style scoped>
 .admin-dashboard {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 20px;
+  max-width: 1100px;
+  margin: 30px auto;
   font-family: "Segoe UI", sans-serif;
-  color: #333;
 }
-
-h1 {
-  text-align: center;
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 20px;
 }
-
-.search-bar {
-  display: block;
-  margin: 0 auto 20px;
-  padding: 10px 14px;
-  width: 350px;
-  font-size: 16px;
+.filters input,
+.filters select {
+  padding: 8px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  font-size: 14px;
 }
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-}
-
-th,
-td {
+.user-block {
   border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
-
-th {
-  background-color: #f4f7fa;
-  font-weight: bold;
-}
-
-.account-row {
-  background-color: #fcfcfc;
-}
-
-input[type="number"] {
-  width: 90px;
-  padding: 4px;
-  font-size: 14px;
-}
-
-select {
-  padding: 4px;
-  font-size: 14px;
-}
-
-.status-active {
-  color: green;
-  font-weight: bold;
-}
-
-.status-pending {
-  color: orange;
-  font-weight: bold;
-}
-
-.status-rejected {
-  color: red;
-  font-weight: bold;
-}
-
-button {
-  padding: 6px 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.error-message {
-  color: red;
-  font-weight: bold;
-  margin-top: 20px;
-  text-align: center;
-}
-
-.filters {
+.user-header {
+  background-color: #f0f8ff;
+  padding: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  gap: 1rem;
-  flex-wrap: wrap;
 }
-
-.filters label {
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.status-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.status-tag {
   font-weight: bold;
-  font-size: 14px;
 }
-
-.filters select {
-  margin-left: 8px;
-  padding: 6px;
-  border-radius: 4px;
-  font-size: 14px;
+.status-tag.active {
+  color: green;
 }
-
+.status-tag.pending {
+  color: orange;
+}
+.status-tag.rejected {
+  color: red;
+}
+.account-section {
+  padding: 15px;
+  background-color: #fcfcfc;
+}
+.account-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.account-section th,
+.account-section td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+.arrow-toggle {
+  cursor: pointer;
+  font-size: 20px;
+}
+.save-btn {
+  background-color: #3498db;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.save-btn:hover {
+  background-color: #217dbb;
+}
+.save-accounts-wrapper {
+  margin-top: 15px;
+  text-align: right;
+}
 .pagination {
   display: flex;
   justify-content: center;
-  align-items: center;
+  gap: 10px;
   margin-top: 20px;
-  gap: 1rem;
 }
-
-.pagination button {
-  padding: 6px 12px;
+.error-message {
+  color: red;
+  text-align: center;
 }
-
-.no-accounts {
-  background-color: #fff8dc;
+input:disabled,
+select:disabled {
+  background-color: #f5f5f5;
+  color: #888;
+  cursor: not-allowed;
 }
 </style>
