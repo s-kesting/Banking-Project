@@ -12,25 +12,27 @@ import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.repository.UserRepository;
 
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 @Service
 public class ATMService {
 
-    private final ATMSessionRepository atmSessionRepository;
-    private final ATMTransactionRepository atmTransactionRepository;
-    private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
+    private final ATMSessionRepository      atmSessionRepository;
+    private final ATMTransactionRepository  atmTransactionRepository;
+    private final AccountRepository         accountRepository;
+    private final UserRepository            userRepository;
 
-    public ATMService(ATMSessionRepository atmSessionRepository,
-                      ATMTransactionRepository atmTransactionRepository,
-                      AccountRepository accountRepository,
-                      UserRepository userRepository) {
-        this.atmSessionRepository = atmSessionRepository;
+    public ATMService(
+            ATMSessionRepository atmSessionRepository,
+            ATMTransactionRepository atmTransactionRepository,
+            AccountRepository accountRepository,
+            UserRepository userRepository
+    ) {
+        this.atmSessionRepository     = atmSessionRepository;
         this.atmTransactionRepository = atmTransactionRepository;
-        this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
+        this.accountRepository        = accountRepository;
+        this.userRepository           = userRepository;
     }
 
     public ATMSession startSession(Integer accountId) {
@@ -55,55 +57,58 @@ public class ATMService {
             int amount,
             ATMTransactionType type
     ) {
+        // 1) Lookup session or throw 400
+        ATMSession session = atmSessionRepository.findById(sessionId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Invalid ATM session."
+            ));
+
+        // 2) Create and attach session
         ATMTransaction txn = new ATMTransaction();
+        txn.setSession(session);
+        txn.setType(type);
+        txn.setAmount(amount);
 
-        // Validate session
-        Optional<ATMSession> sessionOpt = atmSessionRepository.findById(sessionId);
-        if (sessionOpt.isEmpty()) {
+        // 3) Lookup account or throw 400
+        Account account = accountRepository.findById(accountId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Account not found."
+            ));
+
+        // 4) Lookup user or throw 400
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "User not found."
+            ));
+
+        // 5) Verify ownership
+        if (!account.getUserId().equals(user.getUserId())) {
             txn.setStatus(ATMTransactionStatus.FAILED);
-            txn.setReason("Invalid ATM session.");
             return atmTransactionRepository.save(txn);
         }
-        txn.setSession(sessionOpt.get());
 
-        // Validate account & user existence
-        Optional<Account> accountOpt = accountRepository.findById(accountId);
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (accountOpt.isEmpty() || userOpt.isEmpty()) {
-            txn.setStatus(ATMTransactionStatus.FAILED);
-            txn.setReason("Account or user not found.");
-            return atmTransactionRepository.save(txn);
-        }
-        Account account = accountOpt.get();
-
-        // Validate amount > 0
+        // 6) Validate amount > 0
         if (amount <= 0) {
             txn.setStatus(ATMTransactionStatus.FAILED);
-            txn.setReason("Amount must be greater than zero.");
             return atmTransactionRepository.save(txn);
         }
 
-        // Check sufficient funds if withdrawing
+        // 7) Check sufficient funds if withdrawing
         double currentBalance = account.getBalance();
         if (type == ATMTransactionType.WITHDRAWAL && currentBalance < amount) {
             txn.setStatus(ATMTransactionStatus.FAILED);
-            txn.setReason("Insufficient funds.");
             return atmTransactionRepository.save(txn);
         }
 
-        // Apply balance change
+        // 8) Apply balance change
         double newBalance = (type == ATMTransactionType.WITHDRAWAL)
-                ? currentBalance - amount
-                : currentBalance + amount;
+                ? (currentBalance - amount)
+                : (currentBalance + amount);
         account.setBalance(newBalance);
         accountRepository.save(account);
 
-        // Record a successful transaction
-        txn.setAmount(amount);
-        txn.setType(type);
+        // 9) Record a successful transaction
         txn.setStatus(ATMTransactionStatus.SUCCESS);
-        txn = atmTransactionRepository.save(txn);
-
-        return txn;
+        return atmTransactionRepository.save(txn);
     }
 }

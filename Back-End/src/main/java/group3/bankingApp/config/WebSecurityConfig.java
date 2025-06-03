@@ -47,7 +47,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/user/auth/check-bsn").permitAll()
                         .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
                         .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
-                        .requestMatchers("/atm/**").permitAll(
+                        .requestMatchers("/atm/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
                         UsernamePasswordAuthenticationFilter.class);
