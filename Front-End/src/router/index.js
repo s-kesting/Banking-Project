@@ -8,6 +8,7 @@ import Authentication from "@/components/Authentication.vue";
 import EmployeeOverview from "@/components/AdminDashboard/EmployeeOverview.vue";
 import EmployeeTransaction from "@/components/AdminDashboard/EmployeeTransaction.vue";
 import EmployeeTransfering from "@/components/AdminDashboard/EmployeeTransfering.vue";
+import ATMView from "@/components/ATM/ATMView.vue";
 
 let employeeRoutes = [];
 
@@ -73,6 +74,15 @@ const routes = [
       requiresRole: "EMPLOYEE",
     },
   },
+  {
+    path: "/atm",
+    name: "ATM",
+    component: ATMView,
+    meta: {
+      requiresAuth: true,
+      requiresRole: "CUSTOMER",
+    },
+  },
 ];
 
 const router = createRouter({
@@ -102,11 +112,12 @@ router.beforeEach((to, from, next) => {
             return;
           }
         }
-        if (authStore.userRole === "CUSTOMER") {
-          if (to.path !== "/dashboard") {
-            next("/dashboard");
-            return;
-          }
+        if (
+          authStore.userRole === "CUSTOMER" &&
+          to.meta.requiresRole !== "CUSTOMER"
+        ) {
+          next("/dashboard");
+          return;
         }
       }
     }

@@ -4,7 +4,10 @@
       <h1>Products</h1>
     </div>
     <div class="right">
-      <button class="transfer-btn">Transfer</button>
+      <button class="nav-btn">Transfer</button>
+      <router-link to="/atm">
+        <button class="nav-btn">Deposit/Withdraw</button>
+      </router-link>
     </div>
   </header>
 </template>
@@ -19,7 +22,7 @@
   padding: 1rem 2rem;
 }
 
-.top-nav .transfer-btn {
+.top-nav .nav-btn {
   background-color: #facc15;
   border: none;
   padding: 0.5rem 1rem;
