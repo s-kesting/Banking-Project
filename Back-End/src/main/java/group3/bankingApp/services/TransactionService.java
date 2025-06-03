@@ -1,8 +1,11 @@
 package group3.bankingApp.services;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -98,6 +101,41 @@ public class TransactionService {
         transaction.setDescription(request.getDescription());
         transaction.setCreatedAt(LocalDateTime.now());
         return transaction;
+    }
+    
+    // private helpers to search IBAN based user name
+     private List<Integer> getMyAccountIds(int userId) {
+    return accountRepository.findByUserId(userId).stream().map(Account::getAccountId).collect(Collectors.toList());
+    }
+
+    private Set<Integer> getCounterpartyAccountIds(List<Integer> myAccountIds) {
+        List<Transaction> relatedTxs = transactionRepository.findByAccountIds(myAccountIds);
+        Set<Integer> counterIds = new HashSet<>();
+
+        for (Transaction tx : relatedTxs) {
+            int senderId   = tx.getSenderAccount();
+            int receiverId = tx.getReceiverAccount();
+
+            if (myAccountIds.contains(senderId)) {
+                counterIds.add(receiverId);
+            } else if (myAccountIds.contains(receiverId)) {
+                counterIds.add(senderId);
+            }
+        }
+        return counterIds;
+    }
+
+    private List<String> filterIbansByName(Set<Integer> counterAccountIds, String searchName) {
+        List<Account> counterAccounts = accountRepository.findAllById(counterAccountIds);
+        String lowerName = searchName.toLowerCase();
+
+        return counterAccounts.stream().map(Account::getUserId)
+            .distinct()
+            .flatMap(uid -> userRepository.findById(uid).stream())
+            .filter(user -> user.getUsername().toLowerCase().contains(lowerName))
+            .flatMap(user -> accountRepository.findByUserId(user.getUserId()).stream().map(Account::getIBAN) )
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     public List<Transaction> getAllTransactions() {

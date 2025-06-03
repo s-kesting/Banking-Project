@@ -5,9 +5,6 @@
         <div class="iban">{{ iban }}</div>
       </div>
       <div class="balance">€ {{ balance.toFixed(2) }}</div>
-       <button class="transfer-button" @click="onPay">
-      Transfer
-    </button>
     </div>
   </template>
   
@@ -18,11 +15,7 @@
     iban: String,
     balance: Number
   });
-  const emit = defineEmits(["pay"]);
 
-function onPay() {
-  emit("pay", props.iban);
-}
   </script>
   
   <style scoped>
@@ -52,17 +45,5 @@ function onPay() {
     color: #10b981;
     font-size: 1.1rem;
   }
-  .transfer-button {
-  padding: 0.5rem 1rem;
-  background-color: #10b981;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.transfer-button:hover {
-  background-color: #059669;
-}
   </style>
   

@@ -12,27 +12,12 @@ import NewAccountButton from './NewAccountButton.vue'
 import { onBeforeMount, onMounted, ref } from 'vue'
 import apiClient from '../../utils/apiClient'
 import API_ENDPOINTS from '../../config'
-import { setInitialSenderIban } from '@/stores/contentPropsStore'
-import UserTransaction from '@/components/transaction/UserTransaction.vue'
 
 
 let loading = ref(false)
 let error = ref(null)
 let accounts = ref([])
 
-// 3) Declare that this component will emit "active-item" and "navigate":
-const emit = defineEmits([ 'active-item', 'navigate' ])
-
-function onPay(iban) {
-  // a) Save the clicked IBAN into our shared ref
-  setInitialSenderIban(iban)
-
-  // b) Tell MainLayout to highlight "Transfer" (sidebar event name: "active-item")
-  emit('active-item', 'Transfer')
-
-  // c) Tell MainLayout to swap its <component> over to UserTransaction.vue
-  emit('navigate', UserTransaction)
-}
 
 const fetch = async () => {
     try {
