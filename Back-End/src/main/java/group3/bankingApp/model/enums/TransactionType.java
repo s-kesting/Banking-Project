@@ -1,5 +1,7 @@
 package group3.bankingApp.model.enums;
 
-public class TransactionType {
+public  enum TransactionType {
     
+    TRANSFER, WITHDRAW, DEPOSIT
+
 }

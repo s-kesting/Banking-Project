@@ -1,4 +1,4 @@
-package group3.bankingApp.dto;
+package group3.bankingApp.DTO;
 
 import java.time.Instant;
 
