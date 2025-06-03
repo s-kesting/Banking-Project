@@ -9,11 +9,13 @@
   </template>
   
   <script setup>
+
   const props = defineProps({
     accountName: String,
     iban: String,
     balance: Number
-  })
+  });
+
   </script>
   
   <style scoped>

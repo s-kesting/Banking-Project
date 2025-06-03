@@ -1,7 +1,7 @@
-package group3.bankingApp.dto;
+package group3.bankingApp.DTO;
 
-import group3.bankingApp.model.enums.ATMTransactionType;
 import group3.bankingApp.model.enums.ATMTransactionStatus;
+import group3.bankingApp.model.enums.ATMTransactionType;
 
 public class ATMTransactionResponseDTO {
 

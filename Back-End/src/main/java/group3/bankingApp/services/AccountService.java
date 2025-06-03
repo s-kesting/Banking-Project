@@ -21,6 +21,10 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+    public List<Account> findByUserIdAndAccountType(int userId, AccountType accountType) {
+        return accountRepository.findByUserIdAndAccountType(userId, accountType);
+    }
+
     public Account save(Account account) {
         return accountRepository.save(account);
     }
@@ -30,9 +34,7 @@ public class AccountService {
     }
 
     public List<Account> findUsersAccounts(int userId) {
-        // <<<<<<< HEAD
         // return accountRepository.findByUserId(userId);
-        // =======
         List<Account> accounts = accountRepository.findByUserId(userId);
         if (accounts.isEmpty()) {
             throw new NoSuchElementException("No accounts found for user ID: " + userId);
@@ -42,6 +44,10 @@ public class AccountService {
 
     public Page<Account> findAll(Pageable pageable) {
         return accountRepository.findAll(pageable);
+    }
+
+    public void newAccountRequest(int userId, AccountType accountType) {
+        createAccount(userId, accountType);
     }
 
     public void createDefaultAccountsForUser(Integer userId) {

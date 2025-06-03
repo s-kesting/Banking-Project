@@ -1,14 +1,18 @@
 package group3.bankingApp.config;
 
-import group3.bankingApp.security.*;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.*;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.config.Customizer;
+
+import group3.bankingApp.security.CustomUserDetailsService;
+import group3.bankingApp.security.JwtTokenFilter;
+import group3.bankingApp.security.JwtTokenProvider;
 
 @Configuration
 @EnableMethodSecurity
@@ -46,7 +50,10 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/user/auth/check-email").permitAll()
                         .requestMatchers("/api/user/auth/check-bsn").permitAll()
                         .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/api/transactions/user/**").hasAuthority("CUSTOMER")
                         .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/api/transactions/employee-transfer").hasAuthority("EMPLOYEE")
+                        
                         .requestMatchers("/atm/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),

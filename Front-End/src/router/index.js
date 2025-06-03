@@ -7,6 +7,7 @@ import DashBoard from "@/components/DashBoard.vue";
 import Authentication from "@/components/Authentication.vue";
 import EmployeeOverview from "@/components/AdminDashboard/EmployeeOverview.vue";
 import EmployeeTransaction from "@/components/AdminDashboard/EmployeeTransaction.vue";
+import UserTransaction from "@/components/transaction/UserTransaction.vue";
 import EmployeeTransfering from "@/components/AdminDashboard/EmployeeTransfering.vue";
 import ATMView from "@/components/ATM/ATMView.vue";
 
@@ -66,6 +67,13 @@ const routes = [
     },
   },
   {
+    path: "/user_transaction", 
+    name: "UserTransaction",
+    component: UserTransaction,
+    meta: { 
+      requiresAuth: true, 
+      requiresRole: "CUSTOMER"
+    },
     path: "/employee_transfering",
     name: "EmployeeTransfering",
     component: EmployeeTransfering,

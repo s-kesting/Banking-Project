@@ -1,5 +1,6 @@
 package group3.bankingApp.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,9 +8,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.util.List;
-import java.util.Optional;
+
 import group3.bankingApp.model.Account;
+import group3.bankingApp.model.enums.AccountType;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
@@ -27,10 +28,12 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     void deposit(@Param("id") Integer id, @Param("amount") double amount);
 
     List<Account> findByUserId(int userId);
-    
+
     Optional<Account> findByIBAN(String IBAN);
 
-    //Check whether bank number is exist
-    boolean existsByIBAN(String IBAN);      
+    List<Account> findByUserIdAndAccountType(int userId, AccountType accountType);
+
+    // Check whether bank number is exist
+    boolean existsByIBAN(String IBAN);
 
 }
