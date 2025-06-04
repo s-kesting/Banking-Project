@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 
 import group3.bankingApp.model.Transaction;
 
-
 /**
  * TransactionRepository
  */
@@ -20,10 +19,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     List<Transaction> findByAccountIds(@Param("ids") List<Integer> ids);
 
     @Query("SELECT t FROM Transaction t " +
-       "JOIN Account senderAcc ON t.senderAccount = senderAcc.accountId " +
-       "JOIN User sender ON senderAcc.userId = sender.userId " +
-       "JOIN Account receiverAcc ON t.receiverAccount = receiverAcc.accountId " +
-       "JOIN User receiver ON receiverAcc.userId = receiver.userId " +
-       "WHERE LOWER(sender.username) LIKE %:query% OR LOWER(receiver.username) LIKE %:query%")
+            "JOIN Account senderAcc ON t.senderAccount = senderAcc.accountId " +
+            "JOIN User sender ON senderAcc.userId = sender.userId " +
+            "JOIN Account receiverAcc ON t.receiverAccount = receiverAcc.accountId " +
+            "JOIN User receiver ON receiverAcc.userId = receiver.userId " +
+            "WHERE LOWER(sender.username) LIKE %:query% OR LOWER(receiver.username) LIKE %:query%")
     Page<Transaction> findBySenderOrReceiverUsername(@Param("query") String query, Pageable pageable);
+
+    List<Transaction> findBySender_UserIdOrReceiver_UserId(int senderUserId, int recieverUserId);
 }

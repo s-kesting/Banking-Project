@@ -1,4 +1,5 @@
 package group3.bankingApp.services;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,20 +24,24 @@ import group3.bankingApp.repository.TransactionRepository;
 import group3.bankingApp.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
-
 @Service
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-    public TransactionService(AccountRepository accountRepository,TransactionRepository transactionRepository, UserRepository userRepository){
+    public TransactionService(AccountRepository accountRepository, TransactionRepository transactionRepository,
+            UserRepository userRepository) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
     }
 
-    public Transaction save(Transaction transaction){
+    public List<Transaction> getUserTransactionBySenderOrReceiverAccount(int userId) {
+        return transactionRepository.findBySender_UserIdOrReceiver_UserId(userId, userId);
+    }
+
+    public Transaction save(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
 
@@ -55,9 +60,10 @@ public class TransactionService {
         Transaction transaction = buildTransaction(sender, receiver, request);
         return transactionRepository.save(transaction);
     }
-    //private helper method for transaction
-    //check IBAN and amount
-     private void validateRequest(TransactionRequestDTO request) {
+
+    // private helper method for transaction
+    // check IBAN and amount
+    private void validateRequest(TransactionRequestDTO request) {
         if (request.getAmount() <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
@@ -68,21 +74,22 @@ public class TransactionService {
             throw new IllegalArgumentException("Receiver IBAN must be provided");
         }
     }
-    //search for IBAN
-     private Account searchAccountByIban(String iban, String errorMessage) {
+
+    // search for IBAN
+    private Account searchAccountByIban(String iban, String errorMessage) {
         return accountRepository
-            .findByIBAN(iban)
-            .orElseThrow(() -> new NoSuchElementException(errorMessage));
+                .findByIBAN(iban)
+                .orElseThrow(() -> new NoSuchElementException(errorMessage));
     }
 
-    //avoid sending fund to yourself
-     private void preventSelfTransfer(Account sender, Account receiver) {
+    // avoid sending fund to yourself
+    private void preventSelfTransfer(Account sender, Account receiver) {
         if (sender.getAccountId().equals(receiver.getAccountId())) {
             throw new IllegalArgumentException("Cannot transfer to the same account");
         }
     }
 
-     private void checkAbsoluteLimit(Account sender, double amount) {
+    private void checkAbsoluteLimit(Account sender, double amount) {
         double newBalance = sender.getBalance() - amount;
         if (newBalance < sender.getAbsoluteLimit()) {
             throw new IllegalArgumentException("Insufficient funds");
@@ -96,7 +103,7 @@ public class TransactionService {
         accountRepository.save(receiver);
     }
 
-   private Transaction buildTransaction(Account sender, Account receiver, TransactionRequestDTO request) {
+    private Transaction buildTransaction(Account sender, Account receiver, TransactionRequestDTO request) {
         Transaction transaction = new Transaction();
         transaction.setSenderAccount(sender.getAccountId());
         transaction.setReceiverAccount(receiver.getAccountId());
@@ -105,10 +112,10 @@ public class TransactionService {
         transaction.setCreatedAt(LocalDateTime.now());
         return transaction;
     }
-    
+
     // private helpers to search IBAN based user name
-     private List<Integer> getMyAccountIds(int userId) {
-    return accountRepository.findByUserId(userId).stream().map(Account::getAccountId).collect(Collectors.toList());
+    private List<Integer> getMyAccountIds(int userId) {
+        return accountRepository.findByUserId(userId).stream().map(Account::getAccountId).collect(Collectors.toList());
     }
 
     private Set<Integer> getCounterpartyAccountIds(List<Integer> myAccountIds) {
@@ -116,7 +123,7 @@ public class TransactionService {
         Set<Integer> counterIds = new HashSet<>();
 
         for (Transaction tx : relatedTxs) {
-            int senderId   = tx.getSenderAccount();
+            int senderId = tx.getSenderAccount();
             int receiverId = tx.getReceiverAccount();
 
             if (myAccountIds.contains(senderId)) {
@@ -133,12 +140,12 @@ public class TransactionService {
         String lowerName = searchName.toLowerCase();
 
         return counterAccounts.stream().map(Account::getUserId)
-            .distinct()
-            .flatMap(uid -> userRepository.findById(uid).stream())
-            .filter(user -> user.getUsername().toLowerCase().contains(lowerName))
-            .flatMap(user -> accountRepository.findByUserId(user.getUserId()).stream().map(Account::getIBAN) )
-            .distinct()
-            .collect(Collectors.toList());
+                .distinct()
+                .flatMap(uid -> userRepository.findById(uid).stream())
+                .filter(user -> user.getUsername().toLowerCase().contains(lowerName))
+                .flatMap(user -> accountRepository.findByUserId(user.getUserId()).stream().map(Account::getIBAN))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public List<Transaction> getAllTransactions() {
@@ -162,12 +169,12 @@ public class TransactionService {
             Account receiverAcc = accountRepository.findById(tx.getReceiverAccount()).orElse(null);
 
             String senderUsername = senderAcc != null
-                ? userRepository.findById(senderAcc.getUserId()).map(User::getUsername).orElse("Unknown")
-                : "Unknown";
+                    ? userRepository.findById(senderAcc.getUserId()).map(User::getUsername).orElse("Unknown")
+                    : "Unknown";
 
             String receiverUsername = receiverAcc != null
-                ? userRepository.findById(receiverAcc.getUserId()).map(User::getUsername).orElse("Unknown")
-                : "Unknown";
+                    ? userRepository.findById(receiverAcc.getUserId()).map(User::getUsername).orElse("Unknown")
+                    : "Unknown";
 
             dto.setSenderUsername(senderUsername);
             dto.setReceiverUsername(receiverUsername);
@@ -181,10 +188,10 @@ public class TransactionService {
     @Transactional
     public Transaction transferFundsAsEmployee(EmployeeTransferRequest req) {
         Account sender = accountRepository.findByIBAN(req.getSenderIBAN())
-            .orElseThrow(() -> new IllegalArgumentException("Sender IBAN is invalid"));
+                .orElseThrow(() -> new IllegalArgumentException("Sender IBAN is invalid"));
 
         Account receiver = accountRepository.findByIBAN(req.getReceiverIBAN())
-            .orElseThrow(() -> new IllegalArgumentException("Receiver IBAN is invalid"));
+                .orElseThrow(() -> new IllegalArgumentException("Receiver IBAN is invalid"));
 
         if (sender.getAccountType() != AccountType.Checking || receiver.getAccountType() != AccountType.Checking) {
             throw new IllegalArgumentException("Only CHECKING accounts are allowed for transfers");
@@ -213,19 +220,17 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
-       public Page<TransactionDTO> getPaginatedTransactionDTOs(Pageable pageable, String query) {
-    Page<Transaction> transactionPage;
+    public Page<TransactionDTO> getPaginatedTransactionDTOs(Pageable pageable, String query) {
+        Page<Transaction> transactionPage;
 
-    if (query != null && !query.trim().isEmpty()) {
-        transactionPage = transactionRepository.findBySenderOrReceiverUsername(query.toLowerCase(), pageable);
-    } else {
-        transactionPage = transactionRepository.findAll(pageable);
+        if (query != null && !query.trim().isEmpty()) {
+            transactionPage = transactionRepository.findBySenderOrReceiverUsername(query.toLowerCase(), pageable);
+        } else {
+            transactionPage = transactionRepository.findAll(pageable);
+        }
+
+        return transactionPage.map(this::convertToDTO);
     }
-
-    return transactionPage.map(this::convertToDTO);
-}
-
-
 
     private TransactionDTO convertToDTO(Transaction tx) {
         TransactionDTO dto = new TransactionDTO();
@@ -234,17 +239,13 @@ public class TransactionService {
         dto.setDescription(tx.getDescription());
         dto.setCreatedAt(tx.getCreatedAt());
 
-        accountRepository.findById(tx.getSenderAccount()).ifPresent(senderAcc ->
-            userRepository.findById(senderAcc.getUserId()).ifPresent(senderUser ->
-                dto.setSenderUsername(senderUser.getUsername())
-            )
-        );
+        accountRepository.findById(tx.getSenderAccount())
+                .ifPresent(senderAcc -> userRepository.findById(senderAcc.getUserId())
+                        .ifPresent(senderUser -> dto.setSenderUsername(senderUser.getUsername())));
 
-        accountRepository.findById(tx.getReceiverAccount()).ifPresent(receiverAcc ->
-            userRepository.findById(receiverAcc.getUserId()).ifPresent(receiverUser ->
-                dto.setReceiverUsername(receiverUser.getUsername())
-            )
-        );
+        accountRepository.findById(tx.getReceiverAccount())
+                .ifPresent(receiverAcc -> userRepository.findById(receiverAcc.getUserId())
+                        .ifPresent(receiverUser -> dto.setReceiverUsername(receiverUser.getUsername())));
 
         return dto;
     }

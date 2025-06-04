@@ -4,9 +4,12 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -15,14 +18,22 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "TRANSACTIONID", nullable = false)
+    @Column(name = "TRANSACTIONID", nullable = false)
     private Integer transactionId;
 
     @Column(name = "SENDER_ACCOUNT", nullable = false)
     private Integer senderAccount; // FK to accounts.accountId
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SENDER_ACCOUNT", referencedColumnName = "ACCOUNTID", insertable = false, updatable = false)
+    private Account sender;
+
     @Column(name = "RECEIVER_ACCOUNT", nullable = false)
     private Integer receiverAccount; // FK to accounts.accountId
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "RECEIVER_ACCOUNT", referencedColumnName = "ACCOUNTID", insertable = false, updatable = false)
+    private Account receiver;
 
     @Column(nullable = false)
     private double amount;

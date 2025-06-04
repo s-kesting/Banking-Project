@@ -21,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import java.util.Map;
 import java.util.HashMap;
 
-
 import group3.bankingApp.DTO.EmployeeTransferRequest;
 import group3.bankingApp.DTO.TransactionDTO;
 import group3.bankingApp.DTO.TransactionRequestDTO;
@@ -48,17 +47,25 @@ public class TransactionController {
         this.accountRepository = accountRepository;
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<Transaction>> getUserTransactions(Authentication authentication) {
+        int userid = jwtParser.getTokenUserId(authentication);
+        List<Transaction> transactions = transactionService.getUserTransactionBySenderOrReceiverAccount(userid);
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
+    }
+
     @Operation(summary = "Create a new transaction (transfer money)", description = "sender, receiver, and records the transaction.")
     @PostMapping("/user")
-    public ResponseEntity<Transaction> createTransactionForUser(@RequestBody TransactionRequestDTO requestDto, Authentication authentication) {
+    public ResponseEntity<Transaction> createTransactionForUser(@RequestBody TransactionRequestDTO requestDto,
+            Authentication authentication) {
 
         // extract the userId from the JWT
         int userId = jwtParser.getTokenUserId(authentication);
         System.out.println(requestDto);
-         // verify that the senderIban belongs to this user
+        // verify that the senderIban belongs to this user
         Account sender = accountRepository
-            .findByIBAN(requestDto.getSenderIban())
-            .orElseThrow(() -> new NoSuchElementException("Sender IBAN not found"));
+                .findByIBAN(requestDto.getSenderIban())
+                .orElseThrow(() -> new NoSuchElementException("Sender IBAN not found"));
         if (!sender.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -73,7 +80,7 @@ public class TransactionController {
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
-    //Pagination the Transaction
+    // Pagination the Transaction
     @GetMapping("/paginated")
     public ResponseEntity<Map<String, Object>> getPaginatedTransactions(
             @RequestParam(defaultValue = "0") int page,
@@ -92,8 +99,7 @@ public class TransactionController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-        @PostMapping("/employee-transfer")
+    @PostMapping("/employee-transfer")
     public ResponseEntity<?> employeeTransfer(@RequestBody EmployeeTransferRequest req) {
         try {
             Transaction tx = transactionService.transferFundsAsEmployee(req);
@@ -102,8 +108,5 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
     }
-
-
-
 
 }
