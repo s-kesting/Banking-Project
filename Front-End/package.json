@@ -12,6 +12,7 @@
     "@vue/language-server": "^2.2.10",
     "@vue/typescript-plugin": "^2.2.10",
     "axios": "^1.8.1",
+    "bootstrap-icons": "^1.13.1",
     "pinia": "^3.0.1",
     "typescript": "^5.8.3",
     "typescript-language-server": "^4.3.4",

@@ -32,11 +32,6 @@ import UserTransaction from "./transaction/UserTransaction.vue";
 
 import apiClient from "../utils/apiClient";
 import { API_BASE_URL } from "../config";
-const fetchtest = async () => {
-    const response = await apiClient.get(API_BASE_URL + "transactions/user");
-    console.log(response.data)
-}
-onMounted(fetchtest())
 
 let content = shallowRef(AccountList)
 let activeItem = ref("Overview")

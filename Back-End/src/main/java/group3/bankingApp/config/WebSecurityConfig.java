@@ -40,6 +40,8 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // FIXME: remove this when done
+                        .requestMatchers("/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
@@ -53,7 +55,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/transactions/user/**").hasAuthority("CUSTOMER")
                         .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
                         .requestMatchers("/api/transactions/employee-transfer").hasAuthority("EMPLOYEE")
-                        
+
                         .requestMatchers("/atm/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),

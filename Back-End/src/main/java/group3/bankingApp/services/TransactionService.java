@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import group3.bankingApp.DTO.EmployeeTransferRequest;
 import group3.bankingApp.DTO.TransactionDTO;
+import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.DTO.TransactionRequestDTO;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.Transaction;
@@ -39,6 +40,13 @@ public class TransactionService {
 
     public List<Transaction> getUserTransactionBySenderOrReceiverAccount(int userId) {
         return transactionRepository.findBySender_UserIdOrReceiver_UserId(userId, userId);
+    }
+
+    public Page<TransactionJoinDTO> getTransactionsByIban(String Iban, Pageable pageable) {
+        Page<TransactionJoinDTO> transactions = transactionRepository.findBySender_IBANOrReceiver_IBAN(Iban, Iban,
+                pageable);
+
+        return transactions;
     }
 
     public Transaction save(Transaction transaction) {

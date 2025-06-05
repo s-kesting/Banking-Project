@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import group3.bankingApp.DTO.TransactionDTO;
+import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.model.Transaction;
 
 /**
@@ -27,4 +29,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     Page<Transaction> findBySenderOrReceiverUsername(@Param("query") String query, Pageable pageable);
 
     List<Transaction> findBySender_UserIdOrReceiver_UserId(int senderUserId, int recieverUserId);
+
+    Page<TransactionJoinDTO> findBySender_IBANOrReceiver_IBAN(String senderIban, String receiverIban,
+            Pageable pageable);
+
 }

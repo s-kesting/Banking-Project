@@ -2,7 +2,8 @@
     <h2>My current savings accounts</h2>
     <div class="account-list">
         <AccountCard v-for="account in accounts" :key="account.iban" :account-name="account.accountType"
-            :iban="account.iban" :balance="account.balance" />
+            :iban="account.iban" :balance="account.balance" :load-transactions="true" />
+
     </div>
 </template>
 

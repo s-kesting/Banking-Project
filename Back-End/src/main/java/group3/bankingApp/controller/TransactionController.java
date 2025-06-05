@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import group3.bankingApp.DTO.EmployeeTransferRequest;
 import group3.bankingApp.DTO.TransactionDTO;
+import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.DTO.TransactionRequestDTO;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.Transaction;
@@ -52,6 +53,21 @@ public class TransactionController {
         int userid = jwtParser.getTokenUserId(authentication);
         List<Transaction> transactions = transactionService.getUserTransactionBySenderOrReceiverAccount(userid);
         return new ResponseEntity<>(transactions, HttpStatus.OK);
+    }
+
+    @GetMapping("/Iban")
+    public ResponseEntity<Page<TransactionJoinDTO>> getTransactionsByIban(Authentication authentication,
+            @RequestParam String Iban, @RequestParam int page) {
+        int userId = jwtParser.getTokenUserId(authentication);
+        // TODO: add check to see if iban matches user Id;
+
+        int size = 5;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<TransactionJoinDTO> transactions = transactionService.getTransactionsByIban(Iban, pageable);
+
+        System.out.println(transactions);
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
+
     }
 
     @Operation(summary = "Create a new transaction (transfer money)", description = "sender, receiver, and records the transaction.")
