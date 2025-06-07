@@ -32,7 +32,8 @@
         id="amount"
         v-model.number="amount"
         type="number"
-        min="1"
+        step="0.01"
+        min="0.01"
         placeholder="Enter amount"
       />
 
@@ -64,7 +65,6 @@ export default {
     return {
       accounts: [],
       selectedAccountId: "",
-      sessionId: null,
       sessionStarted: false,
       amount: 0,
       message: "",
@@ -77,7 +77,6 @@ export default {
     this.fetchAccounts();
   },
   computed: {
-    // return the account object for the selected ID, or null if none
     currentAccount() {
       return (
         this.accounts.find((a) => a.accountId === this.selectedAccountId) ||
@@ -86,7 +85,6 @@ export default {
     },
   },
   methods: {
-    // Load only the accounts owned by this user
     async fetchAccounts() {
       try {
         const res = await axios.get("/api/atm/accounts");
@@ -97,91 +95,67 @@ export default {
       }
     },
 
-    // Start a fresh session on the selected account
-    async startSession() {
+    // No more server-side session; just flip flag
+    startSession() {
       this.clearMessages();
       if (!this.selectedAccountId) {
         this.message = "Please choose an account.";
         this.isError = true;
         return;
       }
-
-      try {
-        const res = await axios.post("/api/atm/session", {
-          accountId: this.selectedAccountId,
-        });
-        this.sessionId = res.data.sessionId;
-        this.sessionStarted = true;
-      } catch {
-        this.message = "Could not start session.";
-        this.isError = true;
-      }
+      this.sessionStarted = true;
     },
 
-    // Pre-check + call deposit endpoint
     async handleDeposit() {
       this.clearMessages();
 
-      // 1) Must be > 0
       if (this.amount <= 0) {
         this.message = "Amount must be greater than zero.";
         this.isError = true;
         return;
       }
 
-      // 2) Proceed to call the API
       try {
         await axios.post("/api/atm/deposit", {
-          sessionId: this.sessionId,
           accountId: this.selectedAccountId,
           amount: this.amount,
         });
-
-        // If we get a normal 200 OK, assume success
         this.successText = `Deposited ${this.amount} € successfully.`;
         this.transactionDone = true;
-      } catch {
-        // Any server failure shows a generic error
-        this.message = "Deposit failed. Please try again.";
+      } catch (e) {
+        this.message = e.response?.data?.message || "Deposit failed.";
         this.isError = true;
       }
     },
 
-    // Pre-check + call withdraw endpoint
     async handleWithdraw() {
       this.clearMessages();
 
-      // 1) Must be > 0
       if (this.amount <= 0) {
         this.message = "Amount must be greater than zero.";
         this.isError = true;
         return;
       }
 
-      // 2) Must not exceed current balance
       if (this.currentAccount && this.amount > this.currentAccount.balance) {
         this.message = "Cannot withdraw more than current balance.";
         this.isError = true;
         return;
       }
 
-      // 3) Call the API
       try {
         await axios.post("/api/atm/withdraw", {
-          sessionId: this.sessionId,
           accountId: this.selectedAccountId,
           amount: this.amount,
         });
-
         this.successText = `Withdrew ${this.amount} € successfully.`;
         this.transactionDone = true;
-      } catch {
-        this.message = "Withdrawal failed. Please try again.";
+      } catch (e) {
+        this.message = e.response?.data?.message || "Withdrawal failed.";
         this.isError = true;
       }
     },
 
-    // After “OK,” return to dashboard
     goHome() {
       this.$router.push({ path: "/dashboard" });
     },
@@ -242,7 +216,6 @@ export default {
   box-shadow: 0 0 0 1px #38a169; /* green outline */
 }
 
-/* “Proceed” button (when no session started) */
 .atm-view button {
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
@@ -308,7 +281,6 @@ export default {
   background-color: #c53030; /* darker red */
 }
 
-/* Disabled state for Deposit/Withdraw (if you ever disable these) */
 .atm-buttons button:disabled {
   background-color: #cbd5e0;
   color: #a0aec0;

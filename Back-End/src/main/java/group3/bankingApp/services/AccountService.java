@@ -3,6 +3,7 @@ package group3.bankingApp.services;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import group3.bankingApp.model.Account;
 import group3.bankingApp.model.enums.AccountType;
 import group3.bankingApp.model.enums.VerifyStatus;
 import group3.bankingApp.repository.AccountRepository;
+import group3.bankingApp.DTO.AccountSummaryDTO;
 
 @Service
 public class AccountService {
@@ -80,6 +82,16 @@ public class AccountService {
         } while (accountRepository.existsByIBAN(iban)); // ensure uniqueness
 
         return iban;
+    }
+
+    public List<AccountSummaryDTO> getAccountSummaries(Integer userId) {
+        return accountRepository.findByUserId(userId).stream()
+            .map(acc -> new AccountSummaryDTO(
+                acc.getAccountId(),
+                acc.getBalance(),
+                acc.getAccountType().toString()
+            ))
+            .collect(Collectors.toList());
     }
 
 }

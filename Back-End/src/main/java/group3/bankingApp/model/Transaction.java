@@ -4,10 +4,14 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import group3.bankingApp.model.enums.TransactionType;
 
 @Entity
 @Table(name = "TRANSACTION")
@@ -15,14 +19,14 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "TRANSACTIONID", nullable = false)
+    @Column(name = "TRANSACTIONID", nullable = false)
     private Integer transactionId;
 
     @Column(name = "SENDER_ACCOUNT", nullable = false)
-    private Integer senderAccount; // FK to accounts.accountId
+    private Integer senderAccount; // FK to account(accountId)
 
     @Column(name = "RECEIVER_ACCOUNT", nullable = false)
-    private Integer receiverAccount; // FK to accounts.accountId
+    private Integer receiverAccount; // FK to account(accountId)
 
     @Column(nullable = false)
     private double amount;
@@ -32,6 +36,10 @@ public class Transaction {
 
     @Column(name = "CREATED_AT", nullable = false)
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TRANSACTION_TYPE", nullable = false)
+    private TransactionType transactionType;
 
     // -- Getters & Setters --
 
@@ -83,4 +91,11 @@ public class Transaction {
         this.createdAt = createdAt;
     }
 
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
 }
