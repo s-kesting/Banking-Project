@@ -24,11 +24,14 @@ import TopNav from "./layout/TopNav.vue";
 import AppFooter from "./footer/AppFooter.vue";
 import SidebarNavigation from "@/components/navigation/SideBarNavigation.vue";
 import AccountList from "@/components/accounts/AccountList.vue";
-import { ref, shallowRef } from 'vue'
+import { onMounted, ref, shallowRef } from 'vue'
 import SavingsAccount from "./accounts/SavingsAccount.vue";
 import CheckingsAccount from "./accounts/CheckingsAccount.vue";
 import CreateAccount from "./accounts/CreateAccount.vue";
 import UserTransaction from "./transaction/UserTransaction.vue";
+
+import apiClient from "../utils/apiClient";
+import { API_BASE_URL } from "../config";
 
 let content = shallowRef(AccountList)
 let activeItem = ref("Overview")

@@ -21,9 +21,9 @@ import org.springframework.data.domain.Sort;
 import java.util.Map;
 import java.util.HashMap;
 
-
 import group3.bankingApp.DTO.EmployeeTransferRequest;
 import group3.bankingApp.DTO.TransactionDTO;
+import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.DTO.TransactionRequestDTO;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.Transaction;
@@ -48,17 +48,40 @@ public class TransactionController {
         this.accountRepository = accountRepository;
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<Transaction>> getUserTransactions(Authentication authentication) {
+        int userid = jwtParser.getTokenUserId(authentication);
+        List<Transaction> transactions = transactionService.getUserTransactionBySenderOrReceiverAccount(userid);
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
+    }
+
+    @GetMapping("/Iban")
+    public ResponseEntity<Page<TransactionJoinDTO>> getTransactionsByIban(Authentication authentication,
+            @RequestParam String Iban, @RequestParam int page) {
+        int userId = jwtParser.getTokenUserId(authentication);
+        // TODO: add check to see if iban matches user Id;
+
+        int size = 5;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<TransactionJoinDTO> transactions = transactionService.getTransactionsByIban(Iban, pageable);
+
+        System.out.println(transactions);
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
+
+    }
+
     @Operation(summary = "Create a new transaction (transfer money)", description = "sender, receiver, and records the transaction.")
     @PostMapping("/user")
-    public ResponseEntity<Transaction> createTransactionForUser(@RequestBody TransactionRequestDTO requestDto, Authentication authentication) {
+    public ResponseEntity<Transaction> createTransactionForUser(@RequestBody TransactionRequestDTO requestDto,
+            Authentication authentication) {
 
         // extract the userId from the JWT
         int userId = jwtParser.getTokenUserId(authentication);
         System.out.println(requestDto);
-         // verify that the senderIban belongs to this user
+        // verify that the senderIban belongs to this user
         Account sender = accountRepository
-            .findByIBAN(requestDto.getSenderIban())
-            .orElseThrow(() -> new NoSuchElementException("Sender IBAN not found"));
+                .findByIBAN(requestDto.getSenderIban())
+                .orElseThrow(() -> new NoSuchElementException("Sender IBAN not found"));
         if (!sender.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -67,13 +90,7 @@ public class TransactionController {
         return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
     }
 
-    @GetMapping("/allTransactions")
-    public ResponseEntity<List<TransactionDTO>> getAllTransactions() {
-        List<TransactionDTO> transactions = transactionService.getAllTransactionDTOs();
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
-    }
-
-    //Pagination the Transaction
+    // Pagination the Transaction
     @GetMapping("/paginated")
     public ResponseEntity<Map<String, Object>> getPaginatedTransactions(
             @RequestParam(defaultValue = "0") int page,
@@ -81,7 +98,14 @@ public class TransactionController {
             @RequestParam(required = false) String query) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<TransactionDTO> pagedTransactions = transactionService.getPaginatedTransactionDTOs(pageable, query);
+
+        Page<TransactionJoinDTO> pagedTransactions;
+
+        if (query != null && !query.trim().isEmpty()) {
+            pagedTransactions = transactionService.getPaginatedTransactionJoinDTOsFiltered(query, pageable);
+        } else {
+            pagedTransactions = transactionService.getPaginatedTransactionJoinDTOs(pageable);
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("transactions", pagedTransactions.getContent());
@@ -93,7 +117,8 @@ public class TransactionController {
     }
 
 
-        @PostMapping("/employee-transfer")
+
+    @PostMapping("/employee-transfer")
     public ResponseEntity<?> employeeTransfer(@RequestBody EmployeeTransferRequest req) {
         try {
             Transaction tx = transactionService.transferFundsAsEmployee(req);
@@ -102,8 +127,5 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
     }
-
-
-
 
 }

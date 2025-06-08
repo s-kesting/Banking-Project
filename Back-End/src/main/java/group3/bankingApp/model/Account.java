@@ -1,14 +1,19 @@
 package group3.bankingApp.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import group3.bankingApp.model.enums.AccountType;
 import group3.bankingApp.model.enums.VerifyStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,8 +26,12 @@ public class Account {
     private Integer accountId;
 
     @Column(name = "USERID", nullable = false)
-
     private Integer userId; // FK to users.userId
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USERID", referencedColumnName = "USERID", insertable = false, updatable = false, nullable = true)
+    @JsonBackReference //tells Jackson this is the "child" side and should not be serialized to avoid infinite recursion.
+    private User owner;
 
     @Column(nullable = false, unique = true, length = 34)
     private String IBAN;
@@ -109,4 +118,13 @@ public class Account {
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
     }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
 }
