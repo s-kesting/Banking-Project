@@ -1,5 +1,7 @@
 package group3.bankingApp.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import group3.bankingApp.model.enums.AccountType;
 import group3.bankingApp.model.enums.VerifyStatus;
 import jakarta.persistence.Column;
@@ -28,6 +30,7 @@ public class Account {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USERID", referencedColumnName = "USERID", insertable = false, updatable = false, nullable = true)
+    @JsonBackReference //tells Jackson this is the "child" side and should not be serialized to avoid infinite recursion.
     private User owner;
 
     @Column(nullable = false, unique = true, length = 34)
@@ -115,4 +118,13 @@ public class Account {
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
     }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
 }

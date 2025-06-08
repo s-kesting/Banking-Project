@@ -156,42 +156,6 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
-    }
-
-    // Convert Transaction → TransactionDTO, Display username instead od userid
-    public List<TransactionDTO> getAllTransactionDTOs() {
-        List<Transaction> transactions = transactionRepository.findAll();
-        List<TransactionDTO> dtoList = new ArrayList<>();
-
-        for (Transaction tx : transactions) {
-            TransactionDTO dto = new TransactionDTO();
-            dto.setTransactionId(tx.getTransactionId());
-            dto.setAmount(tx.getAmount());
-            dto.setDescription(tx.getDescription());
-            dto.setCreatedAt(tx.getCreatedAt());
-
-            // 🔄 Lookup sender and receiver usernames
-            Account senderAcc = accountRepository.findById(tx.getSenderAccount()).orElse(null);
-            Account receiverAcc = accountRepository.findById(tx.getReceiverAccount()).orElse(null);
-
-            String senderUsername = senderAcc != null
-                    ? userRepository.findById(senderAcc.getUserId()).map(User::getUsername).orElse("Unknown")
-                    : "Unknown";
-
-            String receiverUsername = receiverAcc != null
-                    ? userRepository.findById(receiverAcc.getUserId()).map(User::getUsername).orElse("Unknown")
-                    : "Unknown";
-
-            dto.setSenderUsername(senderUsername);
-            dto.setReceiverUsername(receiverUsername);
-
-            dtoList.add(dto);
-        }
-
-        return dtoList;
-    }
 
     @Transactional
     public Transaction transferFundsAsEmployee(EmployeeTransferRequest req) {
@@ -228,34 +192,18 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
-    public Page<TransactionDTO> getPaginatedTransactionDTOs(Pageable pageable, String query) {
-        Page<Transaction> transactionPage;
-
-        if (query != null && !query.trim().isEmpty()) {
-            transactionPage = transactionRepository.findBySenderOrReceiverUsername(query.toLowerCase(), pageable);
-        } else {
-            transactionPage = transactionRepository.findAll(pageable);
-        }
-
-        return transactionPage.map(this::convertToDTO);
+    ////////////////////////////////////////////////Robben - Employee List Pagination Transaction 
+    public Page<TransactionJoinDTO> getPaginatedTransactionJoinDTOs(Pageable pageable) {
+        return transactionRepository.findAllJoinDTO(pageable);
     }
 
-    private TransactionDTO convertToDTO(Transaction tx) {
-        TransactionDTO dto = new TransactionDTO();
-        dto.setTransactionId(tx.getTransactionId());
-        dto.setAmount(tx.getAmount());
-        dto.setDescription(tx.getDescription());
-        dto.setCreatedAt(tx.getCreatedAt());
-
-        accountRepository.findById(tx.getSenderAccount())
-                .ifPresent(senderAcc -> userRepository.findById(senderAcc.getUserId())
-                        .ifPresent(senderUser -> dto.setSenderUsername(senderUser.getUsername())));
-
-        accountRepository.findById(tx.getReceiverAccount())
-                .ifPresent(receiverAcc -> userRepository.findById(receiverAcc.getUserId())
-                        .ifPresent(receiverUser -> dto.setReceiverUsername(receiverUser.getUsername())));
-
-        return dto;
+    public Page<TransactionJoinDTO> getPaginatedTransactionJoinDTOsFiltered(String query, Pageable pageable) {
+        return transactionRepository.findBySenderOrReceiverUsernameJoinDTO(query.toLowerCase(), pageable);
     }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////
+
 
 }

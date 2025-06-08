@@ -90,12 +90,6 @@ public class TransactionController {
         return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
     }
 
-    @GetMapping("/allTransactions")
-    public ResponseEntity<List<TransactionDTO>> getAllTransactions() {
-        List<TransactionDTO> transactions = transactionService.getAllTransactionDTOs();
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
-    }
-
     // Pagination the Transaction
     @GetMapping("/paginated")
     public ResponseEntity<Map<String, Object>> getPaginatedTransactions(
@@ -104,7 +98,14 @@ public class TransactionController {
             @RequestParam(required = false) String query) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<TransactionDTO> pagedTransactions = transactionService.getPaginatedTransactionDTOs(pageable, query);
+
+        Page<TransactionJoinDTO> pagedTransactions;
+
+        if (query != null && !query.trim().isEmpty()) {
+            pagedTransactions = transactionService.getPaginatedTransactionJoinDTOsFiltered(query, pageable);
+        } else {
+            pagedTransactions = transactionService.getPaginatedTransactionJoinDTOs(pageable);
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("transactions", pagedTransactions.getContent());
@@ -114,6 +115,8 @@ public class TransactionController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
 
     @PostMapping("/employee-transfer")
     public ResponseEntity<?> employeeTransfer(@RequestBody EmployeeTransferRequest req) {
