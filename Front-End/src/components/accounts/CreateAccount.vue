@@ -1,19 +1,17 @@
 <template>
     <div class="container mt-4">
         <h2>Request a new banking account</h2>
-        <form @submit.prevent="handleSubmit()" class="needs-validation" novalidate>
 
-            <div class="mb-3">
-                <label for="account_type" class="form-label">Account Type</label>
-                <select v-model="form.account_type" class="form-select" id="account_type" required>
-                    <option disabled value="">Select type</option>
-                    <option value="Saving">Savings</option>
-                    <option value="Checking">Checking</option>
-                </select>
-            </div>
+        <div class="mb-3">
+            <label for="account_type" class="form-label">Account Type</label>
+            <select v-model="form.account_type" class="form-select" id="account_type" required>
+                <option disabled value="">Select type</option>
+                <option value="Saving">Savings</option>
+                <option value="Checking">Checking</option>
+            </select>
+        </div>
 
-            <button class="btn btn-primary">Request Account</button>
-        </form>
+        <button :onclick="handleSubmit" class="btn btn-primary">Request Account</button>
         <div v-if="isVisable">please select an account type</div>
     </div>
 </template>
@@ -35,7 +33,7 @@ const handleSubmit = async () => {
     if (form.account_type !== "") {
         try {
             console.log(form.account_type)
-            await apiClient.post(API_ENDPOINTS.userAccounts, form.account_type);
+            await apiClient.post(API_ENDPOINTS.userNewAccount, { accountType: form.account_type });
         } catch {
             //TODO: error handeling
         } finally {
