@@ -63,12 +63,12 @@ public class AccountController {
         return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 
-    @PostMapping("user/newAccount")
+    @Operation(summary = "Post endpoint for requesting a new account for a user")
+    @PostMapping("user")
     public void CreateAccount(Authentication authentication, @RequestBody AccountType accountType) {
         JwtTokenParser parser = new JwtTokenParser();
         int userId = parser.getTokenUserId(authentication);
 
-        // FIXME:: get requestBody
         System.out.println(accountType);
         logger.info("new banking account request from: " + parser.getTokenUsername(authentication));
         // accountService.newAccountRequest(userId, accountType);

@@ -35,7 +35,7 @@ const handleSubmit = async () => {
     if (form.account_type !== "") {
         try {
             console.log(form.account_type)
-            await apiClient.post(API_ENDPOINTS.userNewAccount, form.account_type);
+            await apiClient.post(API_ENDPOINTS.userAccounts, form.account_type);
         } catch {
             //TODO: error handeling
         } finally {

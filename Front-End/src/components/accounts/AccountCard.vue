@@ -56,7 +56,9 @@ function handlePageChange(newPage) {
 }
 
 onMounted(() => {
-    fetchTransactions(props.iban, page.value)
+    if (props.loadTransactions) {
+        fetchTransactions(props.iban, page.value)
+    }
 })
 </script>
 

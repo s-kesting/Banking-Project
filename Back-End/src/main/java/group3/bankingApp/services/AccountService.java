@@ -45,6 +45,15 @@ public class AccountService {
         return accounts;
     }
 
+    public Page<Account> findUsersAccounts(int userId, Pageable pageable) {
+        // return accountRepository.findByUserId(userId);
+        Page<Account> accounts = accountRepository.findByUserId(userId, pageable);
+        if (accounts.isEmpty()) {
+            throw new NoSuchElementException("No accounts found for user ID: " + userId);
+        }
+        return accounts;
+    }
+
     public Page<Account> findAll(Pageable pageable) {
         return accountRepository.findAll(pageable);
     }
@@ -85,9 +94,9 @@ public class AccountService {
         return iban;
     }
 
-
-    //////////////Robben ----- Update Account Status and information///////////////////
-     public void updateAccount(Integer accountId, AccountUpdateDTO dto) {
+    ////////////// Robben ----- Update Account Status and
+    ////////////// information///////////////////
+    public void updateAccount(Integer accountId, AccountUpdateDTO dto) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
 
