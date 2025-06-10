@@ -13,21 +13,33 @@ import apiClient from '../../utils/apiClient'
 import API_ENDPOINTS from '../../config'
 
 let accounts = ref([])
+let metaData = ref([])
 let loading = ref(false)
 let iban = ref([])
 let error = ref(null)
+let page = ref(0)
+let pageSize = ref(1)
 const fetchAccounts = async () => {
     try {
         loading.value = true
-        const response = await apiClient.get(`${API_ENDPOINTS.userCheckingsAccounts}`)
-        accounts.value = response.data
+        const response = await apiClient.get(`${API_ENDPOINTS.userCheckingsAccounts}?page=${page.value}&pageSize=${pageSize.value}`).then(response => {
+            const { content, ...metaData } = response.data
+            return { content, metaData }
+        })
+        console.log(response)
+        accounts.value = response.content
+        metaData.value = response.metData
     } catch (err) {
+        console.log(err)
         error.value = err.message
     } finally {
         loading.value = false
     }
 }
-onMounted(() => { fetchAccounts() }
+onMounted(async () => {
+    await fetchAccounts()
+
+}
 )
 </script>
 

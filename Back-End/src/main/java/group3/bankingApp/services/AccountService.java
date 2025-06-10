@@ -24,8 +24,22 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+    public Page<Account> findByUserIdAndAccountType(int userId, AccountType accountType, Pageable pageable) {
+        return accountRepository.findByUserIdAndAccountTypeAndVerifyAccount(userId, accountType, VerifyStatus.ACTIVE,
+                pageable);
+    }
+
     public List<Account> findByUserIdAndAccountType(int userId, AccountType accountType) {
         return accountRepository.findByUserIdAndAccountType(userId, accountType);
+    }
+
+    public boolean checkIfUserHasPendingAccount(int userId) {
+        return this.accountRepository.existsByUserIdAndVerifyAccount(userId, VerifyStatus.PENDING);
+    }
+
+    public Page<Account> findByUserIdAndVerifyStatus(int userId, VerifyStatus verifyStatus, Pageable pageable) {
+
+        return this.accountRepository.findByUserIdAndVerifyAccount(userId, verifyStatus, pageable);
     }
 
     public Account save(Account account) {

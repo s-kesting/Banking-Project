@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import group3.bankingApp.model.Account;
 import org.springframework.data.domain.Pageable;
 import group3.bankingApp.model.enums.AccountType;
+import group3.bankingApp.model.enums.VerifyStatus;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
@@ -31,7 +32,14 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     Optional<Account> findByIBAN(String IBAN);
 
+    boolean existsByUserIdAndVerifyAccount(int userId, VerifyStatus verifyAccount);
+
     List<Account> findByUserIdAndAccountType(int userId, AccountType accountType);
+
+    Page<Account> findByUserIdAndAccountTypeAndVerifyAccount(int userId, AccountType accountType,
+            VerifyStatus verifyAccount, Pageable pageable);
+
+    Page<Account> findByUserIdAndVerifyAccount(int userId, VerifyStatus verifyAccount, Pageable pageable);
 
     // Check whether bank number is exist
     boolean existsByIBAN(String IBAN);

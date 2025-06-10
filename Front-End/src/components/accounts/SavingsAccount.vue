@@ -9,7 +9,6 @@
 
 <script setup>
 import AccountCard from './AccountCard.vue'
-import NewAccountButton from './NewAccountButton.vue'
 import { onMounted, ref } from 'vue'
 import apiClient from '../../utils/apiClient'
 import API_ENDPOINTS from '../../config'
@@ -17,11 +16,16 @@ import API_ENDPOINTS from '../../config'
 let accounts = ref([])
 let loading = ref(false)
 let error = ref(null)
+let metaData = ref()
 const fetch = async () => {
     try {
         loading.value = true
-        const response = await apiClient.get(`${API_ENDPOINTS.userSavingsAccounts}`)
-        accounts.value = response.data
+        const response = await apiClient.get(`${API_ENDPOINTS.userSavingsAccounts}?page=${page.value}&pageSize=${pageSize.value}`).then(response => {
+            const { content, ...metaData } = response.data
+            return { content, metaData }
+        })
+        accounts.value = response.content
+        metaData.value = response.metaData
     } catch (err) {
         error.value = err.message
     } finally {
@@ -31,7 +35,11 @@ const fetch = async () => {
 
 
 
-onMounted(() => { fetch() }
+onMounted(async () => {
+    await fetch()
+
+    console.log(accounts.value)
+}
 )
 </script>
 

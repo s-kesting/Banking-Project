@@ -12,7 +12,7 @@
         </div>
 
         <button :onclick="handleSubmit" class="btn btn-primary">Request Account</button>
-        <div v-if="isVisable">please select an account type</div>
+        <div v-if="isVisable">{{ message }}</div>
     </div>
 </template>
 
@@ -24,7 +24,7 @@ import API_ENDPOINTS from '../../config'
 const form = reactive({
     account_type: '',
 })
-
+let message = ref("please select a account type")
 const isVisable = ref(false)
 
 const handleSubmit = async () => {
@@ -32,11 +32,17 @@ const handleSubmit = async () => {
     console.log('Form submitted:', form)
     if (form.account_type !== "") {
         try {
-            console.log(form.account_type)
-            await apiClient.post(API_ENDPOINTS.userNewAccount, { accountType: form.account_type });
-        } catch {
-            //TODO: error handeling
+            const response = await apiClient.post(API_ENDPOINTS.userAccounts, { accountType: form.account_type });
+            message.value = response.data
+        } catch (error) {
+            const status = error.status
+            if (status) {
+                message.value = error.response.data.message
+            } else {
+                console.log(error.message)
+            }
         } finally {
+            isVisable.value = true
         }
     }
     else { isVisable.value = true; }

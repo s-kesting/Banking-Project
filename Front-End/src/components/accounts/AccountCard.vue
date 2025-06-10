@@ -29,19 +29,23 @@ const props = defineProps({
     iban: String,
     balance: Number,
     loadTransactions: Boolean,
+    accountStatus: String
 });
 let transactions = ref([])
 let page = ref(0)
 let pageableMetaData = ref([])
-
+let filter = ref()
+let search = ref()
 
 async function fetchTransactions(iban, page) {
     try {
-        await apiClient.get(`${API_ENDPOINTS.transactions}/Iban?page=${page}&Iban=${iban}`).then(response => {
-            const { content, ...metaData } = response.data
-            transactions.value = content
-            pageableMetaData.value = metaData
-        });
+        const url = `${API_ENDPOINTS.transactions}/Iban?page=${page}&Iban=${iban}`
+        await apiClient.get(url)
+            .then(response => {
+                const { content, ...metaData } = response.data
+                transactions.value = content
+                pageableMetaData.value = metaData
+            });
     }
     catch (err) {
         console.log(err)
