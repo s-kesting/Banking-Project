@@ -54,8 +54,6 @@ async function fetchTransactions(iban, page) {
 
 function handlePageChange(newPage) {
     page.value = newPage
-    console.log(page.value)
-    console.log(newPage)
     fetchTransactions(props.iban, page.value)
 }
 
