@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.HashMap;
 
 import group3.bankingApp.DTO.EmployeeTransferRequest;
-import group3.bankingApp.DTO.TransactionDTO;
 import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.DTO.TransactionRequestDTO;
 import group3.bankingApp.model.Account;
@@ -115,8 +114,6 @@ public class TransactionController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
 
     @PostMapping("/employee-transfer")
     public ResponseEntity<?> employeeTransfer(@RequestBody EmployeeTransferRequest req) {
