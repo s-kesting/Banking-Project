@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import group3.bankingApp.DTO.AccountUpdateDTO;
+import group3.bankingApp.DTO.AccountSummaryDTO;
+
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.enums.AccountType;
 import group3.bankingApp.model.enums.VerifyStatus;
 import group3.bankingApp.repository.AccountRepository;
-import group3.bankingApp.DTO.AccountSummaryDTO;
-
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
@@ -39,7 +39,6 @@ public class AccountService {
     }
 
     public List<Account> findUsersAccounts(int userId) {
-        // return accountRepository.findByUserId(userId);
         List<Account> accounts = accountRepository.findByUserId(userId);
         if (accounts.isEmpty()) {
             throw new NoSuchElementException("No accounts found for user ID: " + userId);
@@ -79,10 +78,10 @@ public class AccountService {
         String iban;
 
         do {
-            String checkDigits = String.format("%02d", random.nextInt(100)); // Random 2 digits
+            String checkDigits = String.format("%02d", random.nextInt(100)); // 2 digits
             String accountNumber = String.format("%09d", random.nextInt(1_000_000_000)); // 9 digits
             iban = "NL" + checkDigits + bankCode + accountNumber;
-        } while (accountRepository.existsByIBAN(iban)); // ensure uniqueness
+        } while (accountRepository.existsByIBAN(iban));
 
         return iban;
     }
@@ -95,19 +94,18 @@ public class AccountService {
                 acc.getAccountType().toString()
             ))
             .collect(Collectors.toList());
+    }
 
     //////////////Robben ----- Update Account Status and information///////////////////
-     public void updateAccount(Integer accountId, AccountUpdateDTO dto) {
+    public void updateAccount(Integer accountId, AccountUpdateDTO dto) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
 
         // Optional: add business rule validation here
-
         account.setAbsoluteLimit(dto.getAbsoluteLimit());
         account.setDailyLimit(dto.getDailyLimit());
         account.setVerifyAccount(VerifyStatus.valueOf(dto.getVerifyAccount()));
 
         accountRepository.save(account);
     }
-
 }
