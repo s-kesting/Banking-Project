@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/config";
 
-//FIXME: remove authstore data when token expires
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({

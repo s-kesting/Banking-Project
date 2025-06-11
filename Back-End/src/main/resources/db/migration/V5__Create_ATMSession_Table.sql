@@ -1,7 +1,0 @@
--- Create ATMSession table
-CREATE TABLE ATMSession (
-    sessionID INT AUTO_INCREMENT PRIMARY KEY,
-    accountID INTEGER NOT NULL,
-    login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (accountID) REFERENCES account(accountID)
-);
