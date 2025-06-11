@@ -169,10 +169,16 @@ public class TransactionService {
             throw new IllegalArgumentException("Only CHECKING accounts are allowed for transfers");
         }
 
+        if (sender.getAccountId().equals(receiver.getAccountId())) {
+            throw new IllegalArgumentException("Cannot transfer to the same account");
+        }
+
+
         double remainingBalance = sender.getBalance() - req.getAmount();
         if (remainingBalance < sender.getAbsoluteLimit()) {
             throw new IllegalArgumentException("Sender balance is not sufficient for this transaction");
         }
+
 
         // Withdraw and deposit
         sender.setBalance(sender.getBalance() - req.getAmount());

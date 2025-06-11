@@ -27,7 +27,7 @@ public class User {
     @Column(name = "USERID")
     private Integer userId;
     
-    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     @JsonManagedReference //tells Jackson this is the "parent" side of the relationship.
     private List<Account> accounts;
 
