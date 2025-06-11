@@ -26,8 +26,22 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+    public Page<Account> findByUserIdAndAccountType(int userId, AccountType accountType, Pageable pageable) {
+        return accountRepository.findByUserIdAndAccountTypeAndVerifyAccount(userId, accountType, VerifyStatus.ACTIVE,
+                pageable);
+    }
+
     public List<Account> findByUserIdAndAccountType(int userId, AccountType accountType) {
         return accountRepository.findByUserIdAndAccountType(userId, accountType);
+    }
+
+    public boolean checkIfUserHasPendingAccount(int userId) {
+        return this.accountRepository.existsByUserIdAndVerifyAccount(userId, VerifyStatus.PENDING);
+    }
+
+    public Page<Account> findByUserIdAndVerifyStatus(int userId, VerifyStatus verifyStatus, Pageable pageable) {
+
+        return this.accountRepository.findByUserIdAndVerifyAccount(userId, verifyStatus, pageable);
     }
 
     public Account save(Account account) {
@@ -40,6 +54,15 @@ public class AccountService {
 
     public List<Account> findUsersAccounts(int userId) {
         List<Account> accounts = accountRepository.findByUserId(userId);
+        if (accounts.isEmpty()) {
+            throw new NoSuchElementException("No accounts found for user ID: " + userId);
+        }
+        return accounts;
+    }
+
+    public Page<Account> findUsersAccounts(int userId, Pageable pageable) {
+        // return accountRepository.findByUserId(userId);
+        Page<Account> accounts = accountRepository.findByUserId(userId, pageable);
         if (accounts.isEmpty()) {
             throw new NoSuchElementException("No accounts found for user ID: " + userId);
         }
