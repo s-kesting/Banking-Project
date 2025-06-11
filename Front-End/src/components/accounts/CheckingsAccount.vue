@@ -2,7 +2,7 @@
     <h2>My current checkings accounts</h2>
     <div class="account-list">
         <AccountCard v-for="account in accounts" :key="account.iban" :account-name="account.accountType"
-            :iban="account.iban" :balance="account.balance" />
+            :iban="account.iban" :balance="account.balance" :load-transactions="true" />
     </div>
 </template>
 
@@ -14,8 +14,9 @@ import API_ENDPOINTS from '../../config'
 
 let accounts = ref([])
 let loading = ref(false)
+let iban = ref([])
 let error = ref(null)
-const fetch = async () => {
+const fetchAccounts = async () => {
     try {
         loading.value = true
         const response = await apiClient.get(`${API_ENDPOINTS.userCheckingsAccounts}`)
@@ -26,10 +27,7 @@ const fetch = async () => {
         loading.value = false
     }
 }
-
-
-
-onMounted(() => { fetch() }
+onMounted(() => { fetchAccounts() }
 )
 </script>
 

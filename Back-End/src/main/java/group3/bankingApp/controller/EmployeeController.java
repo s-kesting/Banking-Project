@@ -1,11 +1,14 @@
 package group3.bankingApp.controller;
 
 import group3.bankingApp.model.User;
+import group3.bankingApp.DTO.AccountUpdateDTO;
+import group3.bankingApp.DTO.UserWithAccountsDTO;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.enums.VerifyStatus;
 import group3.bankingApp.repository.UserRepository;
 import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.services.AccountService;
+import group3.bankingApp.services.UserService;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -13,9 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Map;
-import java.util.HashMap;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,12 +28,14 @@ public class EmployeeController {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
      private final AccountService accountService;
+     private final UserService userService;
 
     public EmployeeController(UserRepository userRepository, AccountRepository accountRepository,
-            AccountService accountService) {
+            AccountService accountService, UserService userService) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.accountService = accountService;
+        this.userService = userService;
     }
 
     @GetMapping("/users")
@@ -54,59 +56,28 @@ public class EmployeeController {
         return ResponseEntity.ok(result);
     }
 
+    // Robben---Pagination User with Account
     @GetMapping("/users/paginated")
-    public ResponseEntity<Map<String, Object>> getUsersPaginated(
+    public ResponseEntity<Map<String, Object>> getUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String username) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<User> usersPage = (username == null || username.isEmpty()) ?
-                userRepository.findAll(pageable) :
-                userRepository.findByUsernameContainingIgnoreCase(username, pageable);
-
-        List<Map<String, Object>> userList = usersPage.stream().map(user -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("user", user);
-            map.put("accounts", accountRepository.findByUserId(user.getUserId()));
-            return map;
-        }).collect(Collectors.toList());
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("users", userList); //required for frontend
-        response.put("totalPages", usersPage.getTotalPages());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userService.getPaginatedUserDTOs(page, size, username));
     }
 
 
+    //Verify User Status 
     @PutMapping("/users/{userId}/verify")
     public ResponseEntity<?> updateUserVerification(
             @PathVariable Integer userId,
             @RequestBody Map<String, String> body
     ) {
         try {
-            Optional<User> optionalUser = userRepository.findById(userId);
-            if (optionalUser.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
-
-            User user = optionalUser.get();
             String newStatus = body.get("verifyUser");
-
-            // Only trigger account creation if status is changed to ACTIVE
-            boolean wasPending = user.getVerifyUser() != VerifyStatus.ACTIVE;
-            user.setVerifyUser(VerifyStatus.valueOf(newStatus));
-            userRepository.save(user);
-
-            if (newStatus.equals("ACTIVE") && wasPending) {
-                List<Account> existingAccounts = accountRepository.findByUserId(userId);
-                if (existingAccounts.isEmpty()) {
-                    accountService.createDefaultAccountsForUser(userId);
-                }
-            }
-
+            userService.updateUserVerificationStatus(userId, newStatus);
             return ResponseEntity.ok(Map.of("success", true, "message", "User status updated"));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -115,19 +86,19 @@ public class EmployeeController {
     }
 
 
+
     @PutMapping("/accounts/{accountId}")
-    public ResponseEntity<?> updateAccount(@PathVariable Integer accountId, @RequestBody Account updated) {
-        Optional<Account> optionalAccount = accountRepository.findById(accountId);
-        if (optionalAccount.isEmpty()) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> updateAccount(
+            @PathVariable Integer accountId,
+            @RequestBody AccountUpdateDTO dto
+    ) {
+        try {
+            accountService.updateAccount(accountId, dto);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Account updated"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "error", e.getMessage()));
         }
-
-        Account account = optionalAccount.get();
-        account.setVerifyAccount(updated.getVerifyAccount());
-        account.setDailyLimit(updated.getDailyLimit());
-        account.setAbsoluteLimit(updated.getAbsoluteLimit());
-
-        accountRepository.save(account);
-        return ResponseEntity.ok("Account updated");
     }
+
 }
