@@ -1,18 +1,20 @@
 <template>
     <div class="container mt-4">
         <h2>Request a new banking account</h2>
+        <form @submit.prevent="handleSubmit()" class="needs-validation" novalidate>
 
-        <div class="mb-3">
-            <label for="account_type" class="form-label">Account Type</label>
-            <select v-model="form.account_type" class="form-select" id="account_type" required>
-                <option disabled value="">Select type</option>
-                <option value="Saving">Savings</option>
-                <option value="Checking">Checking</option>
-            </select>
-        </div>
+            <div class="mb-3">
+                <label for="account_type" class="form-label">Account Type</label>
+                <select v-model="form.account_type" class="form-select" id="account_type" required>
+                    <option disabled value="">Select type</option>
+                    <option value="Saving">Savings</option>
+                    <option value="Checking">Checking</option>
+                </select>
+            </div>
 
-        <button :onclick="handleSubmit" class="btn btn-primary">Request Account</button>
-        <div v-if="isVisable">{{ message }}</div>
+            <button class="btn btn-primary">Request Account</button>
+        </form>
+        <div v-if="isVisable">please select an account type</div>
     </div>
 </template>
 
@@ -24,7 +26,7 @@ import API_ENDPOINTS from '../../config'
 const form = reactive({
     account_type: '',
 })
-let message = ref("please select a account type")
+
 const isVisable = ref(false)
 
 const handleSubmit = async () => {
@@ -32,17 +34,11 @@ const handleSubmit = async () => {
     console.log('Form submitted:', form)
     if (form.account_type !== "") {
         try {
-            const response = await apiClient.post(API_ENDPOINTS.userAccounts, { accountType: form.account_type });
-            message.value = response.data
-        } catch (error) {
-            const status = error.status
-            if (status) {
-                message.value = error.response.data.message
-            } else {
-                console.log(error.message)
-            }
+            console.log(form.account_type)
+            await apiClient.post(API_ENDPOINTS.userNewAccount, form.account_type);
+        } catch {
+            //TODO: error handeling
         } finally {
-            isVisable.value = true
         }
     }
     else { isVisable.value = true; }

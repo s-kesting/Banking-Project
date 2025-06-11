@@ -29,23 +29,19 @@ const props = defineProps({
     iban: String,
     balance: Number,
     loadTransactions: Boolean,
-    accountStatus: String
 });
 let transactions = ref([])
 let page = ref(0)
 let pageableMetaData = ref([])
-let filter = ref()
-let search = ref()
+
 
 async function fetchTransactions(iban, page) {
     try {
-        const url = `${API_ENDPOINTS.transactions}/Iban?page=${page}&Iban=${iban}`
-        await apiClient.get(url)
-            .then(response => {
-                const { content, ...metaData } = response.data
-                transactions.value = content
-                pageableMetaData.value = metaData
-            });
+        await apiClient.get(`${API_ENDPOINTS.transactions}/Iban?page=${page}&Iban=${iban}`).then(response => {
+            const { content, ...metaData } = response.data
+            transactions.value = content
+            pageableMetaData.value = metaData
+        });
     }
     catch (err) {
         console.log(err)
@@ -54,13 +50,13 @@ async function fetchTransactions(iban, page) {
 
 function handlePageChange(newPage) {
     page.value = newPage
+    console.log(page.value)
+    console.log(newPage)
     fetchTransactions(props.iban, page.value)
 }
 
 onMounted(() => {
-    if (props.loadTransactions) {
-        fetchTransactions(props.iban, page.value)
-    }
+    fetchTransactions(props.iban, page.value)
 })
 </script>
 

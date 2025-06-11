@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -25,10 +26,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USERID")
     private Integer userId;
-
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    @JsonManagedReference // tells Jackson this is the "parent" side of the relationship.
+    
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @JsonManagedReference //tells Jackson this is the "parent" side of the relationship.
     private List<Account> accounts;
+
 
     @Column(nullable = false, length = 100)
     private String password;
@@ -120,7 +122,7 @@ public class User {
     }
 
     public List<Account> getAccounts() {
-        return accounts;
+    return accounts;
     }
 
     public void setAccounts(List<Account> accounts) {
