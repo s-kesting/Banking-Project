@@ -17,6 +17,8 @@ export const API_ENDPOINTS = {
     transactions: `${API_BASE_URL}transactions`,
     employee: `${API_BASE_URL}employee`,
     usertransaction: `${API_BASE_URL}transactions/user`,
+    searchIban: `${API_BASE_URL}transactions/search-iban`,
+    
 
     //users
     users: `${API_BASE_URL}user`,
@@ -33,5 +35,6 @@ export const API_ENDPOINTS = {
     checkUsername: `${API_BASE_URL}user/auth/check-username`,
     checkEmail: `${API_BASE_URL}user/auth/check-email`,
     checkBsn: `${API_BASE_URL}user/auth/check-bsn`,
+    
 };
 export default API_ENDPOINTS;

@@ -1,24 +1,18 @@
 package group3.bankingApp.services;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import group3.bankingApp.DTO.EmployeeTransferRequest;
-import group3.bankingApp.DTO.TransactionDTO;
 import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.DTO.TransactionRequestDTO;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.Transaction;
-import group3.bankingApp.model.User;
 import group3.bankingApp.model.enums.AccountType;
 import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.repository.TransactionRepository;
@@ -55,18 +49,31 @@ public class TransactionService {
 
     @Transactional
     public Transaction createAndRecordFromRequest(TransactionRequestDTO request) {
+        // dto validation
         validateRequest(request);
-
+        // load accounts by IBAN
         Account sender = searchAccountByIban(request.getSenderIban(), "Sender IBAN not found");
         Account receiver = searchAccountByIban(request.getReceiverIban(), "Receiver IBAN not found");
 
         preventSelfTransfer(sender, receiver);
         checkAbsoluteLimit(sender, request.getAmount());
 
-        updateBalances(sender, receiver, request.getAmount());
+        //update balance
+        sender.setBalance(sender.getBalance() - request.getAmount());
+        receiver.setBalance(receiver.getBalance() + request.getAmount());
+        accountRepository.save(sender);
+        accountRepository.save(receiver);
 
-        Transaction transaction = buildTransaction(sender, receiver, request);
-        return transactionRepository.save(transaction);
+        // build and save transaction record
+        Transaction transaction = new Transaction();
+        transaction.setSenderAccount(sender.getAccountId());
+        transaction.setReceiverAccount(receiver.getAccountId());
+        transaction.setAmount(request.getAmount());
+        transaction.setDescription(request.getDescription());
+        transaction.setCreatedAt(LocalDateTime.now());
+        transactionRepository.save(transaction);
+        return transaction;
+        
     }
 
     // private helper method for transaction
@@ -85,9 +92,7 @@ public class TransactionService {
 
     // search for IBAN
     private Account searchAccountByIban(String iban, String errorMessage) {
-        return accountRepository
-                .findByIBAN(iban)
-                .orElseThrow(() -> new NoSuchElementException(errorMessage));
+        return accountRepository.findByIBAN(iban).orElseThrow(() -> new NoSuchElementException(errorMessage));
     }
 
     // avoid sending fund to yourself
@@ -103,60 +108,12 @@ public class TransactionService {
             throw new IllegalArgumentException("Insufficient funds");
         }
     }
-
-    private void updateBalances(Account sender, Account receiver, double amount) {
-        sender.setBalance(sender.getBalance() - amount);
-        receiver.setBalance(receiver.getBalance() + amount);
-        accountRepository.save(sender);
-        accountRepository.save(receiver);
+    //search iban base on username
+    public List<String> searchCounterpartyIbans(int userId, String name) {
+        return transactionRepository.findCounterpartyIbansByName(userId, name.toLowerCase());
+        
     }
-
-    private Transaction buildTransaction(Account sender, Account receiver, TransactionRequestDTO request) {
-        Transaction transaction = new Transaction();
-        transaction.setSenderAccount(sender.getAccountId());
-        transaction.setReceiverAccount(receiver.getAccountId());
-        transaction.setAmount(request.getAmount());
-        transaction.setDescription(request.getDescription());
-        transaction.setCreatedAt(LocalDateTime.now());
-        return transaction;
-    }
-
-    // private helpers to search IBAN based user name
-    private List<Integer> getMyAccountIds(int userId) {
-        return accountRepository.findByUserId(userId).stream().map(Account::getAccountId).collect(Collectors.toList());
-    }
-
-    private Set<Integer> getCounterpartyAccountIds(List<Integer> myAccountIds) {
-        List<Transaction> relatedTxs = transactionRepository.findByAccountIds(myAccountIds);
-        Set<Integer> counterIds = new HashSet<>();
-
-        for (Transaction tx : relatedTxs) {
-            int senderId = tx.getSenderAccount();
-            int receiverId = tx.getReceiverAccount();
-
-            if (myAccountIds.contains(senderId)) {
-                counterIds.add(receiverId);
-            } else if (myAccountIds.contains(receiverId)) {
-                counterIds.add(senderId);
-            }
-        }
-        return counterIds;
-    }
-
-    private List<String> filterIbansByName(Set<Integer> counterAccountIds, String searchName) {
-        List<Account> counterAccounts = accountRepository.findAllById(counterAccountIds);
-        String lowerName = searchName.toLowerCase();
-
-        return counterAccounts.stream().map(Account::getUserId)
-                .distinct()
-                .flatMap(uid -> userRepository.findById(uid).stream())
-                .filter(user -> user.getUsername().toLowerCase().contains(lowerName))
-                .flatMap(user -> accountRepository.findByUserId(user.getUserId()).stream().map(Account::getIBAN))
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-
+    
     @Transactional
     public Transaction transferFundsAsEmployee(EmployeeTransferRequest req) {
         Account sender = accountRepository.findByIBAN(req.getSenderIBAN())

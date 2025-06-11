@@ -1,10 +1,15 @@
 package group3.bankingApp.controller;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,15 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
-import java.util.Map;
-import java.util.HashMap;
 
 import group3.bankingApp.DTO.EmployeeTransferRequest;
-import group3.bankingApp.DTO.TransactionDTO;
 import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.DTO.TransactionRequestDTO;
 import group3.bankingApp.model.Account;
@@ -126,6 +124,13 @@ public class TransactionController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
+    }
+       @GetMapping("/search-iban")
+    public ResponseEntity<List<String>> searchIbans(@RequestParam String name, Authentication authentication) {
+
+        int userId = jwtParser.getTokenUserId(authentication);
+        List<String> ibans = transactionService.searchCounterpartyIbans(userId, name);
+        return ResponseEntity.ok(ibans);
     }
 
 }

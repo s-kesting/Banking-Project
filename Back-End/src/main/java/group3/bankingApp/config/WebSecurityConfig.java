@@ -51,12 +51,15 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/user/auth/check-username").permitAll()
                         .requestMatchers("/api/user/auth/check-email").permitAll()
                         .requestMatchers("/api/user/auth/check-bsn").permitAll()
-                        .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/atm/**").permitAll()
+                        .requestMatchers("/api/transactions/user").hasAuthority("CUSTOMER")
                         .requestMatchers("/api/transactions/user/**").hasAuthority("CUSTOMER")
-                        .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/api/transactions/search-iban").hasAuthority("CUSTOMER")
+                       // .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
                         .requestMatchers("/api/transactions/employee-transfer").hasAuthority("EMPLOYEE")
 
-                        .requestMatchers("/atm/**").permitAll()
+                       
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
                         UsernamePasswordAuthenticationFilter.class);

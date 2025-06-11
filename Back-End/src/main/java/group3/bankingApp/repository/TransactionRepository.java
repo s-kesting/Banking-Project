@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import group3.bankingApp.DTO.TransactionDTO;
 import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.model.Transaction;
 
@@ -48,4 +47,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     Page<TransactionJoinDTO> findBySender_IBANOrReceiver_IBAN(String senderIban, String receiverIban,
             Pageable pageable);
 
+    @Query("""
+      SELECT DISTINCT
+        CASE 
+          WHEN t.sender.owner.userId = :userId 
+            THEN t.receiver.IBAN 
+          ELSE t.sender.IBAN 
+        END
+      FROM Transaction t
+      WHERE (t.sender.owner.userId = :userId
+             OR t.receiver.owner.userId = :userId)
+        AND (LOWER(t.sender.owner.username)   LIKE %:name%
+           OR LOWER(t.receiver.owner.username) LIKE %:name%)""")
+    List<String> findCounterpartyIbansByName(@Param("userId") Integer userId, @Param("name")   String name);
 }

@@ -2,10 +2,8 @@
   <div class="account-selector">
     <label for="senderIban">Your IBAN:</label>
 
-    <!-- If still loading, show a simple loading message -->
     <div v-if="loading" class="loading">Loading your accounts…</div>
 
-    <!-- Once loaded, render the <select> -->
     <select
       v-else
       id="senderIban"
@@ -19,7 +17,6 @@
         :key="acc.iban"
         :value="acc.iban"
       >
-        <!-- Show IBAN, account type, and formatted balance -->
         {{ acc.iban }} ({{ acc.accountType }}) – €{{ acc.balance.toFixed(2) }}
       </option>
     </select>
@@ -29,33 +26,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import apiClient from "@/utils/apiClient";
-import { API_ENDPOINTS } from "@/config";
+import { ref } from "vue";
 
-// Emit the chosen IBAN up to the parent
-const emit = defineEmits(["select-iban"]);
-
-// State
-const accounts      = ref([]);
-const loading       = ref(true);
-const errorMessage  = ref("");
-const selectedIban  = ref("");
-
-// Fetch the user’s accounts on mount
-onMounted(async () => {
-  try {
-    const res = await apiClient.get(API_ENDPOINTS.userAccounts);
-    accounts.value = res.data;
-  } catch (err) {
-    console.error("Failed to load accounts:", err);
-    errorMessage.value = "Could not load accounts. Please refresh.";
-  } finally {
-    loading.value = false;
+// declare props instead of fetching inside
+const props = defineProps({
+  accounts: {
+    type: Array,
+    default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  errorMessage: {
+    type: String,
+    default: ""
   }
 });
 
-// Emit whenever the dropdown value changes
+const emit = defineEmits(["select-iban"]);
+
+const selectedIban = ref("");
+
+// forward selection to parent
 function onChange() {
   emit("select-iban", selectedIban.value);
 }
@@ -65,23 +58,19 @@ function onChange() {
 .account-selector {
   margin-bottom: 1.5rem;
 }
-
 .loading {
   font-style: italic;
   margin-top: 0.5rem;
 }
-
 label {
   display: block;
   margin-bottom: 0.5rem;
 }
-
 select {
   width: 100%;
   padding: 0.5rem;
   box-sizing: border-box;
 }
-
 .error {
   margin-top: 0.5rem;
   color: red;

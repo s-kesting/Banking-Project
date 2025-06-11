@@ -28,6 +28,7 @@ public class Account {
     @Column(name = "USERID", nullable = false)
     private Integer userId; // FK to users.userId
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USERID", referencedColumnName = "USERID", insertable = false, updatable = false, nullable = true)
     @JsonBackReference //tells Jackson this is the "child" side and should not be serialized to avoid infinite recursion.
@@ -119,12 +120,6 @@ public class Account {
         this.accountType = accountType;
     }
 
-    public User getOwner() {
-        return owner;
-    }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
 
 }
