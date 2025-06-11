@@ -19,7 +19,6 @@ public class JwtTokenParser {
         } else {
             throw new Error("UserId not found in token");
         }
-
     }
 
     public String getTokenUsername(Authentication authentication) {

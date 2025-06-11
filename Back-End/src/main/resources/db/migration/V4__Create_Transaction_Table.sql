@@ -2,7 +2,7 @@
 -- Create Transaction table
 CREATE TABLE transaction (
     transactionID INT AUTO_INCREMENT PRIMARY KEY,
-    sender_account INTEGER NOT NULL,
+    sender_account INTEGER NULL,
     transaction_type transaction_type NULL,
     receiver_account INTEGER NULL,
     amount DOUBLE PRECISION NOT NULL,
