@@ -68,24 +68,31 @@ public class TransactionController {
 
     }
 
-    @Operation(summary = "Create a new transaction (transfer money)", description = "sender, receiver, and records the transaction.")
+     @Operation(summary = "Create a new transaction (transfer money)", description = "sender, receiver, and records the transaction.")
     @PostMapping("/user")
-    public ResponseEntity<Transaction> createTransactionForUser(@RequestBody TransactionRequestDTO requestDto,
-            Authentication authentication) {
+    public ResponseEntity<?> createTransactionForUser(@RequestBody TransactionRequestDTO requestDto,Authentication authentication) {
 
-        // extract the userId from the JWT
         int userId = jwtParser.getTokenUserId(authentication);
-        System.out.println(requestDto);
-        // verify that the senderIban belongs to this user
-        Account sender = accountRepository
-                .findByIBAN(requestDto.getSenderIban())
-                .orElseThrow(() -> new NoSuchElementException("Sender IBAN not found"));
+        // verify sender IBAN exists and belongs to this user
+        Account sender = accountRepository.findByIBAN(requestDto.getSenderIban())
+            .orElseThrow(() -> new NoSuchElementException("Sender IBAN not found"));
         if (!sender.getUserId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "You don’t own the sender account"));
         }
-        // proceed with transaction
-        Transaction savedTransaction = transactionService.createAndRecordFromRequest(requestDto);
-        return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
+        // attempt the transfer, catching any validation exceptions
+        try {
+            Transaction saved = transactionService.createAndRecordFromRequest(requestDto);
+            return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(saved);
+        } catch (NoSuchElementException | IllegalArgumentException ex) {
+            // covers "Receiver IBAN not found", "Insufficient funds", etc.
+            return ResponseEntity
+                .badRequest()
+                .body(Map.of("error", ex.getMessage()));
+        }
     }
 
     // Robben - Pagination the Transaction

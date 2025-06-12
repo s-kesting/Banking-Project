@@ -120,7 +120,10 @@ async function onSubmit() {
     // re-fetch accounts so balance updates
     await fetchAccounts();
   } catch (err) {
-    errorMessage.value = err.response?.data || "Failed to create transaction.";
+     // prefer a structured 
+    errorMessage.value =
+      err.response?.data?.error ||
+      err.response?.data || "Failed to create transaction."
   } finally {
     loading.value = false;
   }
