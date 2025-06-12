@@ -1,21 +1,19 @@
 <template>
   <div class="admin-dashboard">
-    <h1>🌐 Admin Dashboard</h1>
+    <h1>Admin Dashboard</h1>
 
-    <!-- Toasts -->
-    <transition name="fade">
-      <div v-if="success" class="toast toast-success">✅ {{ success }}</div>
-    </transition>
-    <transition name="fade">
-      <div v-if="error" class="toast toast-error">❌ {{ error }}</div>
-    </transition>
+    <!-- Inline Notification -->
+    <div v-if="success || error" class="notification-wrapper">
+      <p v-if="success" class="notification success">{{ success }}</p>
+      <p v-if="error" class="notification error">{{ error }}</p>
+    </div>
 
     <!-- Filters -->
     <div class="filters">
       <input
         v-model="searchQuery"
         @input="fetchUsers"
-        placeholder="🔍 Search username"
+        placeholder="Search username"
       />
       <select v-model="userStatusFilter">
         <option value="ALL">User Status: All</option>
@@ -38,10 +36,10 @@
     >
       <div class="user-header">
         <div class="user-info">
-          <strong>👤 {{ user.username }}</strong>
-          <span>— {{ user.email }}</span>
+          <strong>{{ user.username }}</strong>
+          <span>Email: {{ user.email }}</span>
           <div class="status-controls">
-            <label>🔐 Status:</label>
+            <label>Status:</label>
             <select
               v-model="user.verifyUser"
               :class="`status-tag ${user.verifyUser.toLowerCase()}`"
@@ -52,7 +50,7 @@
               <option value="REJECTED">REJECTED</option>
             </select>
             <button class="save-btn" @click="updateUserStatus(user)">
-              💾 Save User
+              Save User
             </button>
           </div>
         </div>
@@ -66,7 +64,7 @@
         v-if="expandedUser === user.userId && user.accounts.length"
         class="account-section"
       >
-        <h4>🏦 Accounts</h4>
+        <h4>Accounts</h4>
         <table>
           <thead>
             <tr>
@@ -116,7 +114,7 @@
             @click="updateAllAccounts(user)"
             :disabled="user.verifyUser === 'REJECTED'"
           >
-            💾 Save Accounts
+            Save Accounts
           </button>
         </div>
       </div>
@@ -271,140 +269,193 @@ onMounted(fetchUsers);
 </script>
 
 <style scoped>
-/* Toast message fixed top center */
-.toast {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  padding: 12px 18px;
-  border-radius: 8px;
-  font-weight: bold;
-  color: white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  opacity: 0.95;
-}
-.toast-success {
-  background-color: #4caf50;
-}
-.toast-error {
-  background-color: #f44336;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.admin-dashboard {
+  max-width: 1000px;
+  margin: 40px auto;
+  font-family: "Segoe UI", sans-serif;
+  padding: 0 20px;
+  color: #333;
 }
 
-/* Dashboard styling */
-.admin-dashboard {
-  max-width: 1100px;
-  margin: 30px auto;
-  font-family: "Segoe UI", sans-serif;
+h1 {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
 }
+
 .filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 24px;
+  justify-content: center;
 }
 .filters input,
 .filters select {
-  padding: 8px;
-  border-radius: 6px;
+  padding: 8px 12px;
   font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
+
 .user-block {
+  background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
   margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
-/* Default soft blue header */
 .user-header {
-  background-color: #f0f8ff;
-  padding: 15px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-/* 🔶 Override header if it's a new registration */
-.user-block.pending-no-accounts .user-header {
-  background-color: #fff8cc; /* soft yellow */
-  border-left: 6px solid #f1c40f;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
+.user-info h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.user-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
 .status-controls {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
-.status-tag {
-  font-weight: bold;
+.status-controls label {
+  font-size: 14px;
 }
-.status-tag.active {
-  color: green;
+.status-controls select {
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 .status-tag.pending {
-  color: orange;
+  color: #e67e22;
+}
+.status-tag.active {
+  color: #27ae60;
 }
 .status-tag.rejected {
-  color: red;
+  color: #c0392b;
 }
+
+.arrow-toggle {
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+}
+
 .account-section {
-  padding: 15px;
-  background-color: #fcfcfc;
+  padding: 16px;
 }
+.account-section h4 {
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
 .account-section table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 14px;
 }
 .account-section th,
 .account-section td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+.account-section th {
+  background-color: #f1f1f1;
+}
+
+input[type="number"],
+.account-section select {
+  width: 100%;
+  padding: 6px;
+  font-size: 13px;
   border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
+  border-radius: 4px;
 }
-.arrow-toggle {
-  cursor: pointer;
-  font-size: 20px;
-}
+
 .save-btn {
-  background-color: #3498db;
+  padding: 8px 16px;
+  background-color: #007bff;
   color: white;
-  padding: 6px 12px;
   border: none;
   border-radius: 6px;
-  font-weight: bold;
+  font-weight: 500;
   cursor: pointer;
 }
 .save-btn:hover {
-  background-color: #217dbb;
+  background-color: #0069d9;
 }
+
 .save-accounts-wrapper {
-  margin-top: 15px;
+  margin-top: 16px;
   text-align: right;
 }
+
 .pagination {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 30px;
 }
-input:disabled,
-select:disabled {
-  background-color: #f5f5f5;
-  color: #888;
+.pagination button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pagination button:disabled {
+  color: #999;
   cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+.notification-wrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.notification {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.notification.success {
+  background-color: #e6f4ea;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.notification.error {
+  background-color: #fdecea;
+  color: #c62828;
+  border: 1px solid #f5c6cb;
 }
 </style>
