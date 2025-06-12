@@ -123,15 +123,28 @@ export default {
 
       try {
         await authStore.login(username.value, password.value);
-        console.log("successfull login");
-        router.push("/dashboard");
+        console.log("Successful login");
+
+        const verifyStatus = authStore.userStatus;
+
+        if (verifyStatus === "ACTIVE") {
+          router.push("/dashboard");
+        } else if (verifyStatus === "PENDING") {
+          router.push("/pending-welcome");
+        } else {
+          // Fallback in case of unexpected status
+          error.value = "Unexpected account status: " + verifyStatus;
+        }
       } catch (err) {
         if (err.response?.status === 403) {
-          error.value = "Login failed - User not verified yet";
+          error.value =
+            err.response.data?.error ||
+            "Login failed - Account rejected or not allowed";
         } else if (err.response?.status === 401) {
           error.value = "Login failed - Invalid username or password";
         } else {
-          error.value = err.response?.data || "Login failed.";
+          error.value =
+            err.response?.data?.error || "Login failed. Please try again.";
         }
       }
     };

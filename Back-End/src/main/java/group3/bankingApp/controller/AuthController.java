@@ -80,51 +80,65 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+    String username = request.get("username");
+    String password = request.get("password");
 
-        // FIXME: dont call repository through the controller, use a service class
+    System.out.println("Login attempt for username: '" + username + "'");
 
-        String username = request.get("username");
-        String password = request.get("password");
-
-        System.out.println("Login attempt for username: '" + username + "'");
-
-        if (username == null || password == null) {
-            return ResponseEntity.badRequest().body("Username and password must not be null");
-        }
-
-        username = username.trim(); // safe default
-
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isEmpty()) {
-            System.out.println("Username not found in database.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username");
-        }
-
-        User user = optionalUser.get();
-        System.out.println("Found user: " + user.getUsername());
-        System.out.println("VerifyStatus: " + user.getVerifyUser());
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            System.out.println("Incorrect password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
-        }
-
-        if (user.getVerifyUser() != VerifyStatus.ACTIVE) {
-            System.out.println("User not verified: " + user.getVerifyUser());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not yet verified");
-        }
-
-        String token = jwtTokenProvider.createToken(username, user.getRole(), user.getUserId().longValue());
-        System.out.println("[INFO] Token generated successfully for: " + username);
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "token", token,
-                "username", username,
-                "role", user.getRole(),
-                "userId", user.getUserId()));
-
+    if (username == null || password == null) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "error", "Username and password must not be null"
+        ));
     }
+
+    username = username.trim();
+
+    Optional<User> optionalUser = userRepository.findByUsername(username);
+    if (optionalUser.isEmpty()) {
+        System.out.println("Username not found in database.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                "success", false,
+                "error", "Invalid username"
+        ));
+    }
+
+    User user = optionalUser.get();
+    System.out.println("Found user: " + user.getUsername());
+    System.out.println("VerifyStatus: " + user.getVerifyUser());
+
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+        System.out.println("Incorrect password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                "success", false,
+                "error", "Invalid password"
+        ));
+    }
+
+    // lock REJECTED users from logging in at all
+    if (user.getVerifyUser() == VerifyStatus.REJECTED) {
+        System.out.println("Rejected user attempted login: " + username);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "success", false,
+                "error", "Your account has been rejected. Please contact support."
+        ));
+    }
+
+    //Allow PENDING users to log in and redirect to welcome page via frontend
+    String token = jwtTokenProvider.createToken(username, user.getRole(), user.getUserId().longValue());
+    System.out.println("[INFO] Token generated successfully for: " + username);
+
+    return ResponseEntity.ok(Map.of(
+            "success", true,
+            "token", token,
+            "username", username,
+            "role", user.getRole(),
+            "userId", user.getUserId(),
+            "verifyUser", user.getVerifyUser().toString()
+    ));
+}
+
 
         @GetMapping("/check-username")
     public ResponseEntity<?> checkUsername(@RequestParam String username) {
