@@ -10,7 +10,6 @@ import EmployeeTransaction from "@/components/AdminDashboard/EmployeeTransaction
 import UserTransaction from "@/components/transaction/UserTransaction.vue";
 import EmployeeTransfering from "@/components/AdminDashboard/EmployeeTransfering.vue";
 import ATMView from "@/components/ATM/ATMView.vue";
-import PendingWelcome from "@/components/PendingWelcom.vue";
 
 let employeeRoutes = [];
 
@@ -68,12 +67,12 @@ const routes = [
     },
   },
   {
-    path: "/user_transaction",
+    path: "/user_transaction", 
     name: "UserTransaction",
     component: UserTransaction,
-    meta: {
-      requiresAuth: true,
-      requiresRole: "CUSTOMER",
+    meta: { 
+      requiresAuth: true, 
+      requiresRole: "CUSTOMER"
     },
     path: "/employee_transfering",
     name: "EmployeeTransfering",
@@ -87,15 +86,6 @@ const routes = [
     path: "/atm",
     name: "ATM",
     component: ATMView,
-    meta: {
-      requiresAuth: true,
-      requiresRole: "CUSTOMER",
-    },
-  },
-  {
-    path: "/pending-welcome",
-    name: "PendingWelcome",
-    component: PendingWelcome,
     meta: {
       requiresAuth: true,
       requiresRole: "CUSTOMER",
