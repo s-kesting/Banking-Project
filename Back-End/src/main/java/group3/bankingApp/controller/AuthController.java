@@ -135,7 +135,8 @@ public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
             "username", username,
             "role", user.getRole(),
             "userId", user.getUserId(),
-            "verifyUser", user.getVerifyUser().toString()
+            "verifyUser", user.getVerifyUser() != null ? user.getVerifyUser().toString() : "ACTIVE"
+
     ));
 }
 
