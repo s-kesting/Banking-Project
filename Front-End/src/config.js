@@ -10,8 +10,8 @@ export const API_ENDPOINTS = {
     // accounts
     userAccounts: `${API_BASE_URL}account/user`,
     userSavingsAccounts: `${API_BASE_URL}account/user/savings`,
+    userPendingAccounts: `${API_BASE_URL}account/user/pending`,
     userCheckingsAccounts: `${API_BASE_URL}account/user/checkings`,
-    userNewAccount: `${API_BASE_URL}account/user/newAccount`,
 
     transactions: `${API_BASE_URL}transactions`,
     employee: `${API_BASE_URL}employee`,
