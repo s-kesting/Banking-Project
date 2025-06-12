@@ -18,12 +18,17 @@ import group3.bankingApp.model.Account;
 import group3.bankingApp.model.enums.AccountType;
 import group3.bankingApp.model.enums.VerifyStatus;
 import group3.bankingApp.repository.AccountRepository;
+
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
 
     public AccountService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
+    }
+
+    public boolean checkIfIbanBelongsToUser(int userId, String Iban) {
+        return accountRepository.existsByUserIdAndIBAN(userId, Iban);
     }
 
     public Page<Account> findByUserIdAndAccountType(int userId, AccountType accountType, Pageable pageable) {
@@ -111,15 +116,15 @@ public class AccountService {
 
     public List<AccountSummaryDTO> getAccountSummaries(Integer userId) {
         return accountRepository.findByUserId(userId).stream()
-            .map(acc -> new AccountSummaryDTO(
-                acc.getAccountId(),
-                acc.getBalance(),
-                acc.getAccountType().toString()
-            ))
-            .collect(Collectors.toList());
+                .map(acc -> new AccountSummaryDTO(
+                        acc.getAccountId(),
+                        acc.getBalance(),
+                        acc.getAccountType().toString()))
+                .collect(Collectors.toList());
     }
 
-    //////////////Robben ----- Update Account Status and information///////////////////
+    ////////////// Robben ----- Update Account Status and
+    ////////////// information///////////////////
     public void updateAccount(Integer accountId, AccountUpdateDTO dto) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));

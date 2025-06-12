@@ -34,6 +34,8 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     boolean existsByUserIdAndVerifyAccount(int userId, VerifyStatus verifyAccount);
 
+    boolean existsByUserIdAndIBAN(int userId, String IBAN);
+
     List<Account> findByUserIdAndAccountType(int userId, AccountType accountType);
 
     Page<Account> findByUserIdAndAccountTypeAndVerifyAccount(int userId, AccountType accountType,

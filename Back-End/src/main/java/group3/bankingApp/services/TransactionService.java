@@ -1,8 +1,11 @@
 package group3.bankingApp.services;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +46,26 @@ public class TransactionService {
         return transactions;
     }
 
+    public Page<TransactionJoinDTO> getTransactionsByIbanWithFilter(String Iban, Pageable pageable,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String minAmount,
+            String maxAmount,
+            String exactAmount,
+            String filterIban) {
+        Page<TransactionJoinDTO> transactions = transactionRepository.findBySender_IBANOrReceiver_IBANWithFilter(Iban,
+                Iban,
+                startDate,
+                endDate,
+                minAmount,
+                maxAmount,
+                exactAmount,
+                filterIban,
+                pageable);
+
+        return transactions;
+    }
+
     public Transaction save(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
@@ -58,7 +81,7 @@ public class TransactionService {
         preventSelfTransfer(sender, receiver);
         checkAbsoluteLimit(sender, request.getAmount());
 
-        //update balance
+        // update balance
         sender.setBalance(sender.getBalance() - request.getAmount());
         receiver.setBalance(receiver.getBalance() + request.getAmount());
         accountRepository.save(sender);
@@ -73,7 +96,7 @@ public class TransactionService {
         transaction.setCreatedAt(LocalDateTime.now());
         transactionRepository.save(transaction);
         return transaction;
-        
+
     }
 
     // private helper method for transaction
@@ -108,12 +131,58 @@ public class TransactionService {
             throw new IllegalArgumentException("Insufficient funds");
         }
     }
-    //search iban base on username
+
+    // search iban base on username
     public List<String> searchCounterpartyIbans(int userId, String name) {
         return transactionRepository.findCounterpartyIbansByName(userId, name.toLowerCase());
-        
+
     }
-    
+
+    private Transaction buildTransaction(Account sender, Account receiver, TransactionRequestDTO request) {
+        Transaction transaction = new Transaction();
+        transaction.setSenderAccount(sender.getAccountId());
+        transaction.setReceiverAccount(receiver.getAccountId());
+        transaction.setAmount(request.getAmount());
+        transaction.setDescription(request.getDescription());
+        transaction.setCreatedAt(LocalDateTime.now());
+        return transaction;
+    }
+
+    // private helpers to search IBAN based user name
+    private List<Integer> getMyAccountIds(int userId) {
+        return accountRepository.findByUserId(userId).stream().map(Account::getAccountId).collect(Collectors.toList());
+    }
+
+    private Set<Integer> getCounterpartyAccountIds(List<Integer> myAccountIds) {
+        List<Transaction> relatedTxs = transactionRepository.findByAccountIds(myAccountIds);
+        Set<Integer> counterIds = new HashSet<>();
+
+        for (Transaction tx : relatedTxs) {
+            int senderId = tx.getSenderAccount();
+            int receiverId = tx.getReceiverAccount();
+
+            if (myAccountIds.contains(senderId)) {
+                counterIds.add(receiverId);
+            } else if (myAccountIds.contains(receiverId)) {
+                counterIds.add(senderId);
+            }
+        }
+        return counterIds;
+    }
+
+    private List<String> filterIbansByName(Set<Integer> counterAccountIds, String searchName) {
+        List<Account> counterAccounts = accountRepository.findAllById(counterAccountIds);
+        String lowerName = searchName.toLowerCase();
+
+        return counterAccounts.stream().map(Account::getUserId)
+                .distinct()
+                .flatMap(uid -> userRepository.findById(uid).stream())
+                .filter(user -> user.getUsername().toLowerCase().contains(lowerName))
+                .flatMap(user -> accountRepository.findByUserId(user.getUserId()).stream().map(Account::getIBAN))
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public Transaction transferFundsAsEmployee(EmployeeTransferRequest req) {
         Account sender = accountRepository.findByIBAN(req.getSenderIBAN())
@@ -130,12 +199,10 @@ public class TransactionService {
             throw new IllegalArgumentException("Cannot transfer to the same account");
         }
 
-
         double remainingBalance = sender.getBalance() - req.getAmount();
         if (remainingBalance < sender.getAbsoluteLimit()) {
             throw new IllegalArgumentException("Sender balance is not sufficient for this transaction");
         }
-
 
         // Withdraw and deposit
         sender.setBalance(sender.getBalance() - req.getAmount());
@@ -155,7 +222,8 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
-    ////////////////////////////////////////////////Robben - Employee List Pagination Transaction 
+    //////////////////////////////////////////////// Robben - Employee List
+    //////////////////////////////////////////////// Pagination Transaction
     public Page<TransactionJoinDTO> getPaginatedTransactionJoinDTOs(Pageable pageable) {
         return transactionRepository.findAllJoinDTO(pageable);
     }
@@ -164,9 +232,6 @@ public class TransactionService {
         return transactionRepository.findBySenderOrReceiverUsernameJoinDTO(query.toLowerCase(), pageable);
     }
 
-
-
     ////////////////////////////////////////////////////////////////////////////////////
-
 
 }
