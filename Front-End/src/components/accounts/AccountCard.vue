@@ -9,6 +9,7 @@
         </div>
 
         <div v-if="loadTransactions">
+    <TransactionFilterControlls  @filtersApplied="handleFiltersApplied" @filtersCleared="handleFiltersCleared"/>
             <TransactionTable :transactions="transactions" :current-iban="iban" />
             <PaginationControlls :paginationData="pageableMetaData" :current-page="page"
                 @page-changed="handlePageChange" />
@@ -20,9 +21,11 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import apiClient from '../../utils/apiClient';
+import TransactionFilterControlls from '../TransactionFilterControlls.vue';
 import API_ENDPOINTS from '../../config';
 import TransactionTable from '../accounts/TransactionTabel.vue';
 import PaginationControlls from '../navigation/PaginationControlls.vue';
+import { isBreakStatement } from 'typescript';
 
 const props = defineProps({
     accountName: String,
@@ -34,12 +37,24 @@ const props = defineProps({
 let transactions = ref([])
 let page = ref(0)
 let pageableMetaData = ref([])
-let filter = ref()
-let search = ref()
+let filterBool= ref(false)
+let filterQuery = ref("")
 
+function handleFiltersCleared(){
+    filterQuery.value = ''; 
+        fetchTransactions(props.iban,page.value)
+}
+function handleFiltersApplied(queryString){
+    if (queryString !== ""){
+    filterQuery.value = queryString
+        console.log(queryString)
+        fetchTransactions(props.iban,page.value)
+    }
+
+}
 async function fetchTransactions(iban, page) {
     try {
-        const url = `${API_ENDPOINTS.transactions}/Iban?page=${page}&Iban=${iban}`
+        const url = `${API_ENDPOINTS.transactions}/Iban?page=${page}&Iban=${iban}${filterQuery.value}`
         await apiClient.get(url)
             .then(response => {
                 const { content, ...metaData } = response.data

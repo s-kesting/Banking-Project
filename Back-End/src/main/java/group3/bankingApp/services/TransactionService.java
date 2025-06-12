@@ -49,6 +49,26 @@ public class TransactionService {
         return transactions;
     }
 
+    public Page<TransactionJoinDTO> getTransactionsByIbanWithFilter(String Iban, Pageable pageable,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String minAmount,
+            String maxAmount,
+            String exactAmount,
+            String filterIban) {
+        Page<TransactionJoinDTO> transactions = transactionRepository.findBySender_IBANOrReceiver_IBANWithFilter(Iban,
+                Iban,
+                startDate,
+                endDate,
+                minAmount,
+                maxAmount,
+                exactAmount,
+                filterIban,
+                pageable);
+
+        return transactions;
+    }
+
     public Transaction save(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
@@ -156,7 +176,6 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-
     @Transactional
     public Transaction transferFundsAsEmployee(EmployeeTransferRequest req) {
         Account sender = accountRepository.findByIBAN(req.getSenderIBAN())
@@ -173,12 +192,10 @@ public class TransactionService {
             throw new IllegalArgumentException("Cannot transfer to the same account");
         }
 
-
         double remainingBalance = sender.getBalance() - req.getAmount();
         if (remainingBalance < sender.getAbsoluteLimit()) {
             throw new IllegalArgumentException("Sender balance is not sufficient for this transaction");
         }
-
 
         // Withdraw and deposit
         sender.setBalance(sender.getBalance() - req.getAmount());
@@ -198,7 +215,8 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
-    ////////////////////////////////////////////////Robben - Employee List Pagination Transaction 
+    //////////////////////////////////////////////// Robben - Employee List
+    //////////////////////////////////////////////// Pagination Transaction
     public Page<TransactionJoinDTO> getPaginatedTransactionJoinDTOs(Pageable pageable) {
         return transactionRepository.findAllJoinDTO(pageable);
     }
@@ -207,9 +225,6 @@ public class TransactionService {
         return transactionRepository.findBySenderOrReceiverUsernameJoinDTO(query.toLowerCase(), pageable);
     }
 
-
-
     ////////////////////////////////////////////////////////////////////////////////////
-
 
 }
