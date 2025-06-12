@@ -25,7 +25,6 @@ import TransactionFilterControlls from '../TransactionFilterControlls.vue';
 import API_ENDPOINTS from '../../config';
 import TransactionTable from '../accounts/TransactionTabel.vue';
 import PaginationControlls from '../navigation/PaginationControlls.vue';
-import { isBreakStatement } from 'typescript';
 
 const props = defineProps({
     accountName: String,
