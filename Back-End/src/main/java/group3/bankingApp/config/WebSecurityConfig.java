@@ -49,17 +49,22 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/user/auth/check-username").permitAll()
                         .requestMatchers("/api/user/auth/check-email").permitAll()
                         .requestMatchers("/api/user/auth/check-bsn").permitAll()
+                        .requestMatchers("/atm/**").permitAll()
+                        
+                        .requestMatchers("/api/transactions/search-iban").hasAuthority("CUSTOMER")
+                       // .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/api/employee/**").hasAuthority("EMPLOYEE")
                         .requestMatchers("/api/employee/users/paginated").hasAuthority("EMPLOYEE")
                         .requestMatchers("/api/employee/users/{userId}/verify").hasAuthority("EMPLOYEE")
                         .requestMatchers("/api/employee/accounts/{accountId}").hasAuthority("EMPLOYEE")
-                        .requestMatchers("/api/transactions/user/**").hasAuthority("CUSTOMER")
+                       // .requestMatchers("/api/transactions/user/**").hasAuthority("CUSTOMER")
                         .requestMatchers("/api/transactions/paginated").hasAuthority("EMPLOYEE")
                         .requestMatchers("/api/transactions/employee-transfer").hasAuthority("EMPLOYEE")
-
+                        .requestMatchers("/api/transactions/user").hasAuthority("CUSTOMER")
                         .requestMatchers("/api/transactions/Iban").hasAuthority("CUSTOMER")
-                        .requestMatchers("/api/transactions/employee-transfer").hasAuthority("EMPLOYEE")
+                    
 
-                        .requestMatchers("/atm/**").permitAll()
+                       
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userDetailsService),
                         UsernamePasswordAuthenticationFilter.class);
