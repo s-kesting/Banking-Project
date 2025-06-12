@@ -68,7 +68,7 @@ const fetchOverviewData = async () => {
     });
   } catch (err) {
     errorMessage.value =
-      "❌ Failed to load dashboard: " + (err.response?.data || err.message);
+      "Failed to load dashboard: " + (err.response?.data || err.message);
   }
 };
 
@@ -99,6 +99,9 @@ onMounted(fetchOverviewData);
   padding: 30px;
   font-family: "Segoe UI", sans-serif;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .cards-wrapper {

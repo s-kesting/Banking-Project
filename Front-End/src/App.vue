@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- Hide Navbar on /auth -->
-    <nav v-if="!isAuthPage" class="navbar">
+    <!-- Show Navbar only for EMPLOYEE and not on /login -->
+    <nav v-if="user?.role === 'EMPLOYEE' && !isAuthPage" class="navbar">
       <!-- Left Section -->
       <div class="navbar-left">
         <div class="logo">
@@ -56,14 +56,7 @@
 
       <!-- Right Section -->
       <div class="navbar-right">
-        <i class="fas fa-magnifying-glass icon"></i>
-        <div class="notifications">
-          <i class="fas fa-bell icon"></i>
-          <span class="badge">4</span>
-        </div>
-        <span class="username">{{ user?.name || "Guest" }}</span>
-        <div class="avatar">RL</div>
-        <i class="fas fa-chevron-down icon" @click="logout"></i>
+        <i class="fas fa-chevron-down icon" @click="logout">Log Out</i>
       </div>
     </nav>
 
