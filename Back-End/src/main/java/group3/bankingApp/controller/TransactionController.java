@@ -41,11 +41,13 @@ public class TransactionController {
     private final JwtTokenParser jwtParser;
     private final AccountRepository accountRepository;
 
-    public TransactionController(TransactionService transactionService, AccountRepository accountRepository) {
-        this.transactionService = transactionService;
-        this.jwtParser = new JwtTokenParser();
-        this.accountRepository = accountRepository;
-    }
+    public TransactionController(TransactionService transactionService, 
+                             AccountRepository accountRepository,
+                             JwtTokenParser jwtTokenParser) {
+    this.transactionService = transactionService;
+    this.accountRepository = accountRepository;
+    this.jwtParser = jwtTokenParser;
+}
 
     @GetMapping("/user")
     public ResponseEntity<List<Transaction>> getUserTransactions(Authentication authentication) {
@@ -66,7 +68,6 @@ public class TransactionController {
 
         System.out.println(transactions);
         return new ResponseEntity<>(transactions, HttpStatus.OK);
-
     }
 
     @Operation(summary = "Create a new transaction (transfer money)", description = "sender, receiver, and records the transaction.")
