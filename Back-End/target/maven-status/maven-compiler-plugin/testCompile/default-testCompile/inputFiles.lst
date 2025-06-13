@@ -1,9 +1,9 @@
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\BankingAppApplicationTests.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\config\SecurityAuthorizationTest.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\TestConfig.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\UserTestController.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\model\UserTest.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\services\AccountServiceTest.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\services\ATMServiceTest.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\services\TransactionServiceTest.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\services\UserServiceTest.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/BankingAppApplicationTests.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/config/SecurityAuthorizationTest.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/controllers/UserTestController.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/model/AccountTest.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/model/UserTest.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/services/ATMServiceTest.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/services/AccountServiceTest.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/services/TransactionServiceTest.java
+/media/sietse/Data/InHolland/year-2/term4/Banking-Project/Back-End/src/test/java/group3/bankingApp/services/UserServiceTest.java

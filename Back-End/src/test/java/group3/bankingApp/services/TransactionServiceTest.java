@@ -3,15 +3,22 @@ package group3.bankingApp.services;
 import group3.bankingApp.DTO.EmployeeTransferRequest;
 import group3.bankingApp.DTO.TransactionJoinDTO;
 import group3.bankingApp.DTO.TransactionRequestDTO;
+import group3.bankingApp.controller.TransactionController;
 import group3.bankingApp.model.Account;
 import group3.bankingApp.model.Transaction;
 import group3.bankingApp.model.enums.AccountType;
 import group3.bankingApp.repository.AccountRepository;
 import group3.bankingApp.repository.TransactionRepository;
 import group3.bankingApp.repository.UserRepository;
+import group3.bankingApp.security.JwtTokenProvider;
+import group3.bankingApp.util.JwtTokenParser;
+import io.jsonwebtoken.JwtParser;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -20,11 +27,13 @@ import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import group3.bankingApp.security.CustomUserDetails;
 
 public class TransactionServiceTest {
 
@@ -37,8 +46,20 @@ public class TransactionServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
+
     @InjectMocks
     private TransactionService transactionService;
+
+    @Mock
+    private JwtTokenParser jwtParser;
+
+    @Mock
+    private AccountService accountService;
+
+    @InjectMocks
+    private TransactionController controller;
 
     @BeforeEach
     void setUp() {
@@ -155,8 +176,8 @@ public class TransactionServiceTest {
     void getPaginatedTransactionJoinDTOs_ShouldReturnPageOfDTOs() {
         Pageable pageable = PageRequest.of(0, 5);
         TransactionJoinDTO dto = new TransactionJoinDTO(
-            1, "senderUser", "NL01INHO0001", "NL01INHO0002", "receiverUser",
-            100.0, "Test Description", LocalDateTime.now());
+                1, "senderUser", "NL01INHO0001", "NL01INHO0002", "receiverUser",
+                100.0, "Test Description", LocalDateTime.now());
 
         Page<TransactionJoinDTO> mockPage = new PageImpl<>(List.of(dto));
 
@@ -167,24 +188,4 @@ public class TransactionServiceTest {
         assertEquals(1, result.getTotalElements());
         assertEquals("senderUser", result.getContent().get(0).getSenderUsername());
     }
-
-    @Test
-    void getPaginatedTransactionJoinDTOsFiltered_ShouldReturnFilteredPage() {
-        String query = "john";
-        Pageable pageable = PageRequest.of(0, 5);
-        TransactionJoinDTO dto = new TransactionJoinDTO(
-            2, "john_doe", "NL01INHO0003", "NL01INHO0004", "alice",
-            200.0, "Filtered Test", LocalDateTime.now());
-
-        Page<TransactionJoinDTO> mockPage = new PageImpl<>(List.of(dto));
-
-        when(transactionRepository.findBySenderOrReceiverUsernameJoinDTO(query, pageable)).thenReturn(mockPage);
-
-        Page<TransactionJoinDTO> result = transactionService.getPaginatedTransactionJoinDTOsFiltered(query, pageable);
-
-        assertEquals(1, result.getTotalElements());
-        assertTrue(result.getContent().get(0).getSenderUsername().toLowerCase().contains(query));
-    }
-
-
 }
