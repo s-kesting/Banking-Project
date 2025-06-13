@@ -1,4 +1,4 @@
-package group3.bankingApp.controller;
+package group3.bankingApp.controllers;
 
 import group3.bankingApp.DTO.AccountUpdateDTO;
 import group3.bankingApp.model.Account;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
+import group3.bankingApp.controller.EmployeeController;
 
 import java.util.*;
 

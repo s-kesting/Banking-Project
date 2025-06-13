@@ -1,7 +1,7 @@
+group3\bankingApp\services\UserServiceTest.class
+group3\bankingApp\model\UserTest.class
 group3\bankingApp\controllers\UserTestController.class
 group3\bankingApp\services\AccountServiceTest.class
-group3\bankingApp\services\UserServiceTest.class
 group3\bankingApp\BankingAppApplicationTests.class
 group3\bankingApp\config\SecurityAuthorizationTest.class
-group3\bankingApp\model\UserTest.class
 group3\bankingApp\services\TransactionServiceTest.class

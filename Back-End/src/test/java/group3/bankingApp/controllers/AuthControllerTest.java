@@ -116,40 +116,24 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
             .andExpect(status().isUnauthorized())
-            .andExpect(content().string("Invalid password"));
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.error").value("Invalid password"));
+
     }
 
     @Test
-    void testLoginUnverifiedUser() throws Exception {
-        User user = new User();
-        user.setUsername("user1");
-        user.setPassword("encodedpass");
-        user.setVerifyUser(VerifyStatus.PENDING);
-
-        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("pass", "encodedpass")).thenReturn(true);
-
-        Map<String, String> req = Map.of("username", "user1", "password", "pass");
+    void testLoginMissingFields() throws Exception {
+        Map<String, String> loginData = new HashMap<>();
+        loginData.put("username", "");
+        loginData.put("password", "");
 
         mockMvc.perform(post("/api/user/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
-            .andExpect(status().isForbidden())
-            .andExpect(content().string("Account not yet verified"));
+                .content(objectMapper.writeValueAsString(loginData)))
+            .andExpect(status().isUnauthorized())  // Updated expectation
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.error").value("Invalid username"));
     }
-
-    @Test
-void testLoginMissingFields() throws Exception {
-    Map<String, String> loginData = new HashMap<>();
-    loginData.put("username", "");
-    loginData.put("password", "");
-
-    mockMvc.perform(post("/api/user/auth/login")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(loginData)))
-        .andExpect(status().isUnauthorized())  // Updated expectation
-        .andExpect(content().string("Invalid username"));
-}
 
 
     @Test

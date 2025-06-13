@@ -1,6 +1,10 @@
 C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\BankingAppApplicationTests.java
 C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\config\SecurityAuthorizationTest.java
-C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\TestConfig.java
+C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\AccountControllerTest.java
+C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\ATMControllerTest.java
+C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\AuthControllerTest.java
+C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\EmployeeControllerTest.java
+C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\TransactionControllerTest.java
 C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\controllers\UserTestController.java
 C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\model\UserTest.java
 C:\INHOLLAND UNIVERSITY\Second Year\Fourth Term\Code Generation\Banking-Project\Back-End\src\test\java\group3\bankingApp\services\AccountServiceTest.java
