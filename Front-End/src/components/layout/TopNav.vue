@@ -4,7 +4,6 @@
       <h1>Products</h1>
     </div>
     <div class="right">
-      <button class="nav-btn">Transfer</button>
       <router-link to="/atm">
         <button class="nav-btn">Deposit/Withdraw</button>
       </router-link>

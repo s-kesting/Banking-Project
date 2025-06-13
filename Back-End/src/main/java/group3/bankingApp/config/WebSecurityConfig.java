@@ -49,7 +49,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/user/auth/check-username").permitAll()
                         .requestMatchers("/api/user/auth/check-email").permitAll()
                         .requestMatchers("/api/user/auth/check-bsn").permitAll()
-                        .requestMatchers("/atm/**").permitAll()
+                        .requestMatchers("/atm/**").hasAuthority("CUSTOMER")
                         
                         .requestMatchers("/api/transactions/search-iban").hasAuthority("CUSTOMER")
                        // .requestMatchers("/api/transactions/**").hasAuthority("EMPLOYEE")
