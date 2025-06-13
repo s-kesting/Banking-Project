@@ -1,5 +1,5 @@
 // src/config.js
-export const API_BASE_URL = "https://bankapp-xgle.onrender.com/api/";
+export const API_BASE_URL = "http://localhost:8080/api/";
 
 export const API_ENDPOINTS = {
     //autherisation and login
