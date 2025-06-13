@@ -57,13 +57,16 @@ public class TransactionController {
     private final AccountRepository accountRepository;
     private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
-    public TransactionController(TransactionService transactionService, AccountRepository accountRepository,
-            AccountService accountService) {
-        this.transactionService = transactionService;
+    public TransactionController(TransactionService transactionService, 
+                             AccountRepository accountRepository,
+                             JwtTokenParser jwtTokenParser,
+                             AccountService accountService) {
+    this.transactionService = transactionService;
+    this.accountRepository = accountRepository;
         this.accountService = accountService;
-        this.jwtParser = new JwtTokenParser();
-        this.accountRepository = accountRepository;
-    }
+    this.jwtParser = jwtTokenParser;
+}
+
 
     @GetMapping("/user")
     public ResponseEntity<List<Transaction>> getUserTransactions(Authentication authentication) {

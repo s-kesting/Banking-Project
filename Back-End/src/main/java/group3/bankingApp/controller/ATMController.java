@@ -1,4 +1,3 @@
-// src/main/java/group3/bankingApp/controller/ATMController.java
 package group3.bankingApp.controller;
 
 import java.util.List;
@@ -22,10 +21,10 @@ public class ATMController {
     private final AccountService accountService;
     private final JwtTokenParser parser;
 
-    public ATMController(ATMService atmService, AccountService accountService) {
-        this.atmService     = atmService;
+    public ATMController(ATMService atmService, AccountService accountService, JwtTokenParser parser) {
+        this.atmService = atmService;
         this.accountService = accountService;
-        this.parser         = new JwtTokenParser();
+        this.parser = parser;
     }
 
     @GetMapping("/accounts")

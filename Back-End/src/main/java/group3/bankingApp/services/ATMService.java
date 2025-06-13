@@ -49,56 +49,16 @@ public class ATMService {
         double amount,
         TransactionType type
     ) {
-        // 1) Lookup account
-        Account account = accountRepository.findById(accountId)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "Account not found."
-            ));
-
-        // 2) Lookup user
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "User not found."
-            ));
-
-        // 3) Verify ownership
-        if (!account.getUserId().equals(user.getUserId())) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "User does not own this account."
-            );
+        User user = findUserOrThrow(userId);
+        Account account = findAccountOrThrow(accountId);
+        validateOwnership(user, account);
+        validateAmount(amount);
+        if (type == TransactionType.WITHDRAW) {
+            validateFunds(account, amount);
         }
 
-        // 4) Validate positive amount
-        if (amount <= 0) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "Amount must be greater than zero."
-            );
-        }
-
-        // 5) Check funds on withdrawal
-        if (type == TransactionType.WITHDRAW && account.getBalance() < amount) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "Insufficient funds."
-            );
-        }
-
-        // 6) Apply balance change
-        double newBalance = (type == TransactionType.WITHDRAW)
-            ? account.getBalance() - amount
-            : account.getBalance() + amount;
-        account.setBalance(newBalance);
-        accountRepository.save(account);
-
-        // 7) Build and persist the unified Transaction
-        Transaction txn = new Transaction();
-        txn.setCreatedAt(LocalDateTime.now());
-        txn.setTransactionType(type);
-        txn.setAmount(amount);
-        txn.setSenderAccount(type == TransactionType.WITHDRAW ? accountId : null);
-        txn.setReceiverAccount(type == TransactionType.DEPOSIT ? accountId : null);
-        txn.setDescription("ATM " + type);
-
-        return transactionRepository.save(txn);
+        updateAccountBalance(account, amount, type);
+        return saveTransaction(accountId, amount, type);
     }
 
     private TransactionDTO mapToDto(Transaction txn) {
@@ -133,5 +93,62 @@ public class ATMService {
         dto.setReceiverUsername(receiver);
 
         return dto;
+    }
+
+    private User findUserOrThrow(Integer userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "User not found."
+        ));
+}
+
+    private Account findAccountOrThrow(Integer accountId) {
+        return accountRepository.findById(accountId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Account not found."
+            ));
+    }
+
+    private void validateOwnership(User user, Account account) {
+        if (!account.getUserId().equals(user.getUserId())) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "User does not own this account."
+            );
+        }
+    }
+
+    private void validateAmount(double amount) {
+        if (amount <= 0) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Amount must be greater than zero."
+            );
+        }
+    }
+
+    private void validateFunds(Account account, double amount) {
+        if (account.getBalance() < amount) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Insufficient funds."
+            );
+        }
+    }
+
+    private void updateAccountBalance(Account account, double amount, TransactionType type) {
+        double newBalance = (type == TransactionType.WITHDRAW)
+            ? account.getBalance() - amount
+            : account.getBalance() + amount;
+        account.setBalance(newBalance);
+        accountRepository.save(account);
+    }
+
+    private Transaction saveTransaction(Integer accountId, double amount, TransactionType type) {
+        Transaction txn = new Transaction();
+        txn.setCreatedAt(LocalDateTime.now());
+        txn.setTransactionType(type);
+        txn.setAmount(amount);
+        txn.setSenderAccount(type == TransactionType.WITHDRAW ? accountId : null);
+        txn.setReceiverAccount(type == TransactionType.DEPOSIT ? accountId : null);
+        txn.setDescription("ATM " + type);
+        return transactionRepository.save(txn);
     }
 }
